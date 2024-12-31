@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -15,43 +16,58 @@ namespace ElectronicCorrectionNotebook
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
+        private const string settingsFileName = "settings.json";
         private Window mainWindow;
 
         public SettingsPage()
         {
             this.InitializeComponent();
             mainWindow = App.MainWindow;
-            LoadSettings();
+
+            // 确保应用目录存在
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
+
+            LoadSettingsAsync();
         }
 
         // 加载设置
-        private void LoadSettings()
+        private async void LoadSettingsAsync()
         {
-            
+            try
+            {
+                string settingsFilePath = Path.Combine(appDataPath, settingsFileName);
+                if (File.Exists(settingsFilePath))
+                {
+                    string json = await File.ReadAllTextAsync(settingsFilePath);
+                    // 解析 JSON 并加载设置
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                // 文件不存在，可能是第一次运行应用程序
+            }
         }
 
         private async void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
-            // 创建 FolderPicker 让用户选择导出位置
             var folderPicker = new FolderPicker();
             folderPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             folderPicker.FileTypeFilter.Add("*");
 
-            // 获取当前窗口的 HWND
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
 
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
             if (folder != null)
             {
-                // 获取内部存储位置的错题数据文件夹
-                StorageFolder internalFolder = ApplicationData.Current.LocalFolder;
+                StorageFolder internalFolder = await StorageFolder.GetFolderFromPathAsync(appDataPath);
 
-                // 复制文件到用户选择的文件夹
                 await CopyFolderContentsAsync(internalFolder, folder);
 
-                // 显示导出成功的消息
                 ContentDialog successDialog = new ContentDialog()
                 {
                     XamlRoot = this.Content.XamlRoot,

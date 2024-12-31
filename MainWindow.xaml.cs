@@ -27,7 +27,10 @@ namespace ElectronicCorrectionNotebook
         {
             this.InitializeComponent();
             this.Closed += MainWindow_Closed; // 添加关闭事件处理程序
+            this.Title = "ElectricCorrectionNotebook";
+            this.AppWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
+            errorItems = new List<ErrorItem>(); // 初始化 errorItems
             _ = LoadDataAsync();
         }
 

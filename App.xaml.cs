@@ -24,6 +24,7 @@ namespace ElectronicCorrectionNotebook
         public App()
         {
             this.InitializeComponent();
+            // 设置应用图标
         }
 
         /// <summary>

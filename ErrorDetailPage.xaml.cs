@@ -10,6 +10,8 @@ using Windows.Storage;
 using ElectronicCorrectionNotebook.Services;
 using System.Threading.Tasks;
 using Windows.System;
+using System.IO;
+
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -24,6 +26,7 @@ namespace ElectronicCorrectionNotebook
     {
         //创建错题对象
         public ErrorItem ErrorItem { get; set; }
+        private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
 
         // 初始化页面
         public ErrorDetailPage()
@@ -56,19 +59,24 @@ namespace ElectronicCorrectionNotebook
             picker.FileTypeFilter.Add(".png");
 
             // 获取当前窗口句柄
-            var window = new Window();
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var files = await picker.PickMultipleFilesAsync();
             if (files != null && files.Count > 0)
             {
                 // 将图片复制到本地存储
-                var localFolder = ApplicationData.Current.LocalFolder;
+                var imagesFolder = Path.Combine(appDataPath, "Images");
+                if (!Directory.Exists(imagesFolder))
+                {
+                    Directory.CreateDirectory(imagesFolder);
+                }
+
                 foreach (var file in files)
                 {
-                    var copiedFile = await file.CopyAsync(localFolder, file.Name, NameCollisionOption.ReplaceExisting);
-                    ErrorItem.ImagePaths.Add(copiedFile.Path);
+                    var destinationPath = Path.Combine(imagesFolder, file.Name);
+                    await file.CopyAsync(await StorageFolder.GetFolderFromPathAsync(imagesFolder), file.Name, NameCollisionOption.ReplaceExisting);
+                    ErrorItem.ImagePaths.Add(destinationPath);
                 }
                 DisplayImages();
             }
@@ -95,7 +103,6 @@ namespace ElectronicCorrectionNotebook
         // 点击图片放大
         private async void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            // ImageScrollViewer.ChangeView(null, null, 0);
             var image = sender as Image;
             if (image != null)
             {
@@ -122,30 +129,9 @@ namespace ElectronicCorrectionNotebook
         // 点击保存数据
         private async void OnSaveClick(object sender, RoutedEventArgs e)
         {
-            /*
-            ErrorItem.Title = TitleTextBox.Text;
-            ErrorItem.Date = DatePicker.Date.DateTime;
-            ErrorItem.Description = DescriptionTextBox.Text;
-
-            // 保存数据到本地文件
-            var errorItems = await DataService.LoadDataAsync();
-            var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
-            if (existingItem != null)
-            {
-                existingItem.Title = ErrorItem.Title;
-                existingItem.Date = ErrorItem.Date;
-                existingItem.Description = ErrorItem.Description;
-                existingItem.ImagePath = ErrorItem.ImagePath;
-            }
-            else
-            {
-                errorItems.Add(ErrorItem);
-            }
-            await DataService.SaveDataAsync(errorItems);
-            */
             await SaveCurrentContentAsync();
         }
-        
+
         // 日期设置为今天
         private void SetDateToTodayClick(object sender, RoutedEventArgs e)
         {
