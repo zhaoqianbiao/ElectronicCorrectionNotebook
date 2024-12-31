@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="ElectronicCorrectionNotebook.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ElectronicCorrectionNotebook"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    >
+
+    <Grid x:Name="rootPanel">
+        <NavigationView x:Name="nvSample"
+                        IsSettingsVisible="True"
+                        IsBackButtonVisible="Collapsed"
+                        IsBackEnabled="False"
+                        SelectionChanged="NavigationView_SelectionChanged"
+                        AlwaysShowHeader="True"
+                        PaneTitle="Electronic Correction Notebook"
+                        PaneDisplayMode="Left"
+                        ExpandedModeThresholdWidth="500"
+                        SelectionFollowsFocus="Disabled"
+                        IsTabStop="False">
+            <NavigationView.MenuItems>
+                <NavigationViewItemHeader Content="Your errors"/>
+            </NavigationView.MenuItems>
+
+            <NavigationView.PaneFooter>
+                <StackPanel x:Name="Operations" Orientation="Vertical" Visibility="Visible">
+                    <NavigationViewItem Icon="Add" Content="Add Questions" Tapped="Add_Tapped"/>
+                    <NavigationViewItem Icon="Accept" Content="About" Tapped="About_Tapped" />
+                </StackPanel>
+            </NavigationView.PaneFooter>
+
+            <Frame x:Name="contentFrame" />
+        </NavigationView>
+    </Grid>
+</Window>

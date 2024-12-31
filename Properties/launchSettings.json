@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ElectronicCorrectionNotebook (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ElectronicCorrectionNotebook (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
