@@ -18,11 +18,10 @@ Windows端电子错题本**
 
 ## 🎁Auto Spell Check 拼写检查
 得益于WinUI3的API，可以实现自动英文拼写检查
-![image](gitImage/correction1.png)
-![image](gitImage/correction2.png)
+![image](gitImage/correction.png)
 
 ## 🎁Settings 设置
-![image](gitImage/settings_export.png)
+![image](gitImage/settingExport.png)
 
 ## 🎁About 关于
 ![image](gitImage/about.png)
