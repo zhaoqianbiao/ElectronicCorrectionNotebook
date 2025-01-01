@@ -1,4 +1,4 @@
-# ElectronicCorrectionNotebook
+# ElectronicCorrectionNotebook Windows端电子错题本
 **A windows Electronic Correction Notebook, used to record your mistakes in exams and homework   
 Windows端电子错题本**
 
@@ -17,10 +17,11 @@ Windows端电子错题本**
 ![image](gitImage/imageDialog1.png)
 
 ## 🎁Auto Spell Check 拼写检查
-得益于WinUI3的API，可以实现自动英文拼写检查
+### 得益于WinUI3的API，可以实现自动英文拼写检查
 ![image](gitImage/correction1.png)
 
 ## 🎁Settings 设置
+### 可实现笔记备份保存
 ![image](gitImage/settingExport1.png)
 
 ## 🎁About 关于
