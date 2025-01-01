@@ -2,6 +2,7 @@
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 using WinRT.Interop;
+using Windows.ApplicationModel.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,13 +25,15 @@ namespace ElectronicCorrectionNotebook
         public App()
         {
             this.InitializeComponent();
-            // 设置应用图标
         }
 
         /// <summary>
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
+        /// 
+
+
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             MainWindow = new MainWindow();

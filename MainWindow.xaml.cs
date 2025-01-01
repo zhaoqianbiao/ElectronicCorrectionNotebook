@@ -9,6 +9,9 @@ using ElectronicCorrectionNotebook.Services;
 using System.Threading;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.ApplicationModel.Core;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,6 +30,7 @@ namespace ElectronicCorrectionNotebook
         {
             this.InitializeComponent();
             this.Closed += MainWindow_Closed; // 添加关闭事件处理程序
+            CoreApplication.Exiting += OnExiting; // 订阅应用程序退出事件
             this.Title = "ElectricCorrectionNotebook";
             this.AppWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
@@ -70,7 +74,7 @@ namespace ElectronicCorrectionNotebook
                 Title = "New Error",
                 Date = DateTime.Now,
                 Description = "Description...",
-                ImagePaths = new List<string>(),
+                FilePaths = new List<string>(),
                 Rating = -1,
             };
             // 对象中添加
@@ -84,6 +88,7 @@ namespace ElectronicCorrectionNotebook
         // 关于
         private async void About_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            PublicEvents.PlaySystemSound();
             // 创建一个 StackPanel 来包含 TextBlock 和 Image
             StackPanel contentPanel = new StackPanel();
 
@@ -164,7 +169,47 @@ namespace ElectronicCorrectionNotebook
         }
 
         // 窗口关闭时
-        private async void MainWindow_Closed(object sender, WindowEventArgs args)
+        public async void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            // 阻止窗口立即关闭
+            args.Handled = true;
+
+            // 显示确认对话框
+            ContentDialog confirmDialog = new ContentDialog
+            {
+                Title = "Confirm to exit 确认退出",
+                Content = "Are you sure to save and exit? 你确定要保存数据并退出吗？",
+                PrimaryButtonText = "Yes 是",
+                CloseButtonText = "No 否",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.Content.XamlRoot // 确保 XamlRoot 设置正确
+            };
+            PublicEvents.PlaySystemSound();
+            var result = await confirmDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                // 用户确认退出并保存数据
+                await SaveCurrentStateAsync();
+                // 移除关闭事件处理程序，防止再次触发
+                this.Closed -= MainWindow_Closed;
+                // 关闭窗口
+                Application.Current.Exit();
+            }
+            else
+            {
+                // 用户取消退出，不执行任何操作
+            }
+        }
+
+        // 应用程序退出时
+        private async void OnExiting(object sender, object e)
+        {
+            await SaveCurrentStateAsync();
+        }
+
+        // 保存当前状态
+        private async Task SaveCurrentStateAsync()
         {
             if (contentFrame.Content is ErrorDetailPage currentPage)
             {
@@ -172,10 +217,7 @@ namespace ElectronicCorrectionNotebook
             }
             await SaveDataAsync(); // 确保数据在关闭时保存
             cts.Cancel(); // 取消所有异步操作
-            Application.Current.Exit(); // 确保应用程序退出
         }
 
-        // 右键菜单删除项
-        
     }
 }

@@ -1,3 +1,4 @@
+using ElectronicCorrectionNotebook.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -75,7 +76,9 @@ namespace ElectronicCorrectionNotebook
                     Content = "Success 错题数据已成功导出!",
                     CloseButtonText = "Ok"
                 };
+                PublicEvents.PlaySystemSound();
                 await successDialog.ShowAsync();
+                
             }
         }
 

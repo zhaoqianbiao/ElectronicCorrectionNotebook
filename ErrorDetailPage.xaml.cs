@@ -11,7 +11,8 @@ using ElectronicCorrectionNotebook.Services;
 using System.Threading.Tasks;
 using Windows.System;
 using System.IO;
-
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -46,18 +47,18 @@ namespace ElectronicCorrectionNotebook
                 DatePicker.Date = ErrorItem.Date;
                 DescriptionTextBox.Text = ErrorItem.Description;
                 RatingChoose.Value = ErrorItem.Rating;
-                DisplayImages();
+                DisplayFilesIcon();
             }
         }
 
-        // 选择图片按钮点击事件
-        private async void OnSelectImageClick(object sender, RoutedEventArgs e)
+        // 选择文件按钮点击事件
+        private async void OnSelectFileClick(object sender, RoutedEventArgs e)
         {
-            var picker = new FileOpenPicker();
-            picker.SuggestedStartLocation = PickerLocationId.Desktop;
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
+            var picker = new FileOpenPicker
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop
+            };
+            picker.FileTypeFilter.Add("*");  // 允许选择任意文件
 
             // 获取当前窗口句柄
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
@@ -66,60 +67,133 @@ namespace ElectronicCorrectionNotebook
             var files = await picker.PickMultipleFilesAsync();
             if (files != null && files.Count > 0)
             {
-                // 将图片复制到本地存储
-                var imagesFolder = Path.Combine(appDataPath, "Images");
-                if (!Directory.Exists(imagesFolder))
-                {
-                    Directory.CreateDirectory(imagesFolder);
-                }
+                // 将文件复制到本地存储Files文件夹
+                var filesFolder = Path.Combine(appDataPath, "Files");
+                Directory.CreateDirectory(filesFolder);
 
                 foreach (var file in files)
                 {
-                    var destinationPath = Path.Combine(imagesFolder, file.Name);
-                    await file.CopyAsync(await StorageFolder.GetFolderFromPathAsync(imagesFolder), file.Name, NameCollisionOption.ReplaceExisting);
-                    ErrorItem.ImagePaths.Add(destinationPath);
+                    var destinationPath = Path.Combine(filesFolder, file.Name);
+                    await file.CopyAsync(await StorageFolder.GetFolderFromPathAsync(filesFolder), file.Name, NameCollisionOption.ReplaceExisting);
+                    ErrorItem.FilePaths.Add(destinationPath);
                 }
-                DisplayImages();
+                DisplayFilesIcon();
             }
         }
 
-        private void DisplayImages()
+        // 显示文件图标
+        private void DisplayFilesIcon()
         {
-            ImagePanel.Items.Clear();
-            foreach (var imagePath in ErrorItem.ImagePaths)
+            FilePanel.Items.Clear();
+            foreach (var filePath in ErrorItem.FilePaths)
             {
-                var bitmapImage = new BitmapImage(new Uri(imagePath));
+                var fileName = Path.GetFileName(filePath);
+                var fileType = Path.GetExtension(filePath).ToLower();
+                var bitmapImage = new BitmapImage();
+
+                switch (fileType)
+                {
+                    case ".docx":
+                    case ".doc":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/word.png"));
+                        break;
+                    case ".pptx":
+                    case ".ppt":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/powerpoint.png"));
+                        break;
+                    case ".xlsx":
+                    case ".xls":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/excel.png"));
+                        break;
+                    case ".pdf":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/pdf.png"));
+                        break;
+                    case ".txt":
+                    case ".md":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/text.png"));
+                        break;
+                    case ".zip":
+                    case ".rar":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/zip.png"));
+                        break;
+                    case ".xmind":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/xmind.png"));
+                        break;
+                    case ".mp3":
+                    case ".mp4":
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/video.png"));
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".png":
+                    case ".bmp":
+                    case ".gif":
+                    case ".ico":
+                        bitmapImage = new BitmapImage(new Uri(filePath));
+                        break;
+                    default:
+                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/unknown.png"));
+                        break;
+                }
+
                 var image = new Image
                 {
                     Source = bitmapImage,
                     Width = 100,
                     Height = 100,
-                    Margin = new Thickness(5),
+                    Tag = filePath, // 将文件路径存储在Tag中，即使是文件图标，也会传递着文件的路径
                 };
-                image.Tapped += Image_Tapped;
-                ImagePanel.Items.Add(image);
+                image.Tapped += File_Tapped;
+                var fileNameBlock = new TextBlock
+                {
+                    Text = fileName,
+                    Width = 120,
+                    TextWrapping = TextWrapping.Wrap,
+                    TextAlignment = TextAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center 
+                };
+                var contentPanel = new StackPanel
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                };
+                contentPanel.Children.Add(image);
+                contentPanel.Children.Add(fileNameBlock);
+                contentPanel.Margin = new Thickness(5);
+                FilePanel.Items.Add(contentPanel);
             }
         }
 
         // 点击图片放大
-        private async void Image_Tapped(object sender, TappedRoutedEventArgs e)
+        private async void File_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var image = sender as Image;
-            if (image != null)
+            if (sender is Image image && image.Tag is string filePath)
             {
-                DialogImage.Source = image.Source;
-                DialogImage.Tag = ((BitmapImage)image.Source).UriSource.LocalPath; // 将图片路径存储在 Tag 中
-                await ImageDialog.ShowAsync();
+                var fileType = Path.GetExtension(filePath).ToLower();
+                if (fileType == ".jpg" || fileType == ".jpeg" || fileType == ".png" || fileType == ".bmp" || fileType == ".gif" || fileType == ".ico")
+                {
+                    // 如果是图片，显示大图
+                    DialogImage.Source = new BitmapImage(new Uri(filePath));
+                    DialogImage.Tag = filePath; // 将文件路径存储在Tag中
+                    await ImageDialog.ShowAsync();
+                }
+                else
+                {
+                    // 如果是其他文件类型，以默认方式打开文件
+                    var file = await StorageFile.GetFileFromPathAsync(filePath);
+                    if (file != null)
+                    {
+                        await Launcher.LaunchFileAsync(file);
+                    }
+                }
             }
         }
 
-        // 在系统查看器中打开图片
-        private async void OpenInSystemViewerClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        // 以默认方式打开
+        private async void OpenIamgeInSystemClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            var imagePath = DialogImage.Tag as string;
-            if (!string.IsNullOrEmpty(imagePath))
+            if (DialogImage.Tag is string filePath)
             {
-                var file = await StorageFile.GetFileFromPathAsync(imagePath);
+                var file = await StorageFile.GetFileFromPathAsync(filePath);
                 if (file != null)
                 {
                     await Launcher.LaunchFileAsync(file);
@@ -131,6 +205,19 @@ namespace ElectronicCorrectionNotebook
         private async void OnSaveClick(object sender, RoutedEventArgs e)
         {
             await SaveCurrentContentAsync();
+
+
+            ContentDialog saveSuccess = new ContentDialog()
+            {
+                XamlRoot = rootPanel.XamlRoot,
+                Title = "Saved 已保存",
+                Content = "Save successfully 保存成功！",
+                CloseButtonText = "Ok",
+                DefaultButton = ContentDialogButton.Close,
+            };
+            PublicEvents.PlaySystemSound();
+            await saveSuccess.ShowAsync();
+
         }
 
         // 日期设置为今天
@@ -157,7 +244,7 @@ namespace ElectronicCorrectionNotebook
                 existingItem.Title = ErrorItem.Title;
                 existingItem.Date = ErrorItem.Date;
                 existingItem.Description = ErrorItem.Description;
-                existingItem.ImagePaths = ErrorItem.ImagePaths;
+                existingItem.FilePaths = ErrorItem.FilePaths;
                 existingItem.Rating = ErrorItem.Rating;
             }
             else
@@ -177,5 +264,7 @@ namespace ElectronicCorrectionNotebook
                 mainWindow.UpdateNavigationViewItem(ErrorItem);
             }
         }
+
+        
     }
 }
