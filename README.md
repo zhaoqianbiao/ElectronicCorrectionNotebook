@@ -2,6 +2,9 @@
 **A windows Electronic Correction Notebook, used to record your mistakes in exams and homework   
 Windows端电子错题本**
 
+**作者信息：高三再读，等待申请的时候没事干，写了这个小软件，希望对大家有所帮助**   
+**Developer/Author：Grade 12 in international high school in CHINA, waiting for offers of universities....**
+
 ## 未来计划🚩   
 ~~1. 🎁新增添加文件功能~~   （已实现）   
 2. 🎁新增删除page或文件的功能  
