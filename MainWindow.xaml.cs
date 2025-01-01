@@ -70,7 +70,8 @@ namespace ElectronicCorrectionNotebook
                 Title = "New Error",
                 Date = DateTime.Now,
                 Description = "Description...",
-                ImagePaths = new List<string>()
+                ImagePaths = new List<string>(),
+                Rating = -1,
             };
             // 对象中添加
             errorItems.Add(newErrorItem);

@@ -45,6 +45,7 @@ namespace ElectronicCorrectionNotebook
                 TitleTextBox.Text = ErrorItem.Title;
                 DatePicker.Date = ErrorItem.Date;
                 DescriptionTextBox.Text = ErrorItem.Description;
+                RatingChoose.Value = ErrorItem.Rating;
                 DisplayImages();
             }
         }
@@ -146,6 +147,7 @@ namespace ElectronicCorrectionNotebook
             ErrorItem.Title = TitleTextBox.Text;
             ErrorItem.Date = DatePicker.Date.DateTime;
             ErrorItem.Description = DescriptionTextBox.Text;
+            ErrorItem.Rating = RatingChoose.Value;
 
             // 传递数据给DataService 保存
             var errorItems = await DataService.LoadDataAsync();
@@ -156,6 +158,7 @@ namespace ElectronicCorrectionNotebook
                 existingItem.Date = ErrorItem.Date;
                 existingItem.Description = ErrorItem.Description;
                 existingItem.ImagePaths = ErrorItem.ImagePaths;
+                existingItem.Rating = ErrorItem.Rating;
             }
             else
             {
