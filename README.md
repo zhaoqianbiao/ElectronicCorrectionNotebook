@@ -24,6 +24,9 @@ Windows端电子错题本**
 ## 🎁Image Dialog 图片查看
 ![image](gitImage/imageDialog1.png)
 
+## 🎁Add Files 添加文件
+![image](gitImage/openFile1.png)
+
 ## 🎁Auto Spell Check 拼写检查
 ### 得益于WinUI3的API，可以实现自动英文拼写检查
 ![image](gitImage/correction1.png)
