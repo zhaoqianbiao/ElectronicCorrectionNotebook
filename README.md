@@ -5,7 +5,8 @@ Windows端电子错题本📘📘📘**
 **🪶🪶🪶作者信息：高三再读，等待申请的时候没事干，写了这个小软件，希望可以辅助大家偷偷内卷**   
 **Developer/Author：Grade 12 in international high school in CHINA, waiting for offers of universities....**
 
-![image](gitImage/tang.gif)
+<img src="gitImage/tang.gif" width="200px">
+
 
 ## 未来计划 持续更新中...🚩   
 
