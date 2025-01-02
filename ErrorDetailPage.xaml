@@ -55,8 +55,5 @@
                        PrimaryButtonClick="OpenIamgeInSystemClick">
             <Image x:Name="DialogImage" Stretch="Uniform" ManipulationMode="All" />
         </ContentDialog>
-
-        
-        
     </StackPanel>
 </Page>

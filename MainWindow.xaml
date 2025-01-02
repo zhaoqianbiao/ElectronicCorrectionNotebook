@@ -33,6 +33,7 @@
             </NavigationView.PaneFooter>
 
             <Frame x:Name="contentFrame" />
+            
         </NavigationView>
     </Grid>
 </Window>
