@@ -11,8 +11,6 @@ using ElectronicCorrectionNotebook.Services;
 using System.Threading.Tasks;
 using Windows.System;
 using System.IO;
-using Windows.Media.Core;
-using Windows.Media.Playback;
 
 
 // To learn more about WinUI, the WinUI project structure,
