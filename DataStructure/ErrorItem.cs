@@ -9,7 +9,8 @@ namespace ElectronicCorrectionNotebook
         public string Title { get; set; }
         public DateTime Date { get; set; }
         public string Description { get; set; }
-        public List<string> FilePaths { get; set; } = new List<string>();
         public double Rating { get; set; }
+
+        public List<string> FilePaths { get; set; } = new List<string>();
     }
 }

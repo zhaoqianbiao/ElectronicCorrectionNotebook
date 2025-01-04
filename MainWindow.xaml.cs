@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ElectronicCorrectionNotebook.Services;
+using ElectronicCorrectionNotebook.DataStructure;
 using System.Threading;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -29,7 +30,7 @@ namespace ElectronicCorrectionNotebook
 
     public sealed partial class MainWindow : Window
     {
-        private List<ErrorItem> errorItems;
+        private List<Folder> folders = new List<Folder>();
         private CancellationTokenSource cts;
 
         private const int MinWidth = 1250;  // 设置最小宽度
@@ -51,13 +52,13 @@ namespace ElectronicCorrectionNotebook
 
             appWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
-            errorItems = new List<ErrorItem>();
             _ = LoadDataAsync(cts.Token);
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
         }
 
+        #region MinMaxSizeCodeRegion
         private delegate IntPtr WinProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
         private WinProc newWndProc = null;
         private IntPtr oldWndProc = IntPtr.Zero;
@@ -110,6 +111,8 @@ namespace ElectronicCorrectionNotebook
             IntPtr WindowHandle { get; }
         }
 
+        #endregion
+
         // 加载数据-从json中读取数据
         private async Task LoadDataAsync(CancellationToken token)
         {
@@ -150,20 +153,8 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 导航栏中添加新项
-        private void AddNavigationViewItem(ErrorItem errorItem)
-        {
-            var newItem = new NavigationViewItem
-            {
-                Content = errorItem.Title,
-                Icon = new SymbolIcon(Symbol.Comment),
-                Tag = errorItem
-            };
-            nvSample.MenuItems.Add(newItem);
-        }
-
-        // 添加新错题-总步骤
-        private async void Add_Tapped(object sender, TappedRoutedEventArgs e)
+        // 添加新页面-总步骤_DS
+        private async void AddItems_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var newErrorItem = new ErrorItem
             {
@@ -176,6 +167,43 @@ namespace ElectronicCorrectionNotebook
             errorItems.Add(newErrorItem);
             AddNavigationViewItem(newErrorItem);
             await SaveDataAsync(cts.Token);
+        }
+
+        // 导航栏中添加新项_UI
+        private void AddNavigationViewItem(ErrorItem errorItem)
+        {
+            var newItem = new NavigationViewItem
+            {
+                Content = errorItem.Title,
+                Icon = new SymbolIcon(Symbol.Comment),
+                Tag = errorItem
+            };
+            nvSample.MenuItems.Add(newItem);
+        }
+
+        // 添加新文件夹-总步骤_DS
+        private async void AddFolders_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var newFolder = new Folder
+            {
+                FolderName = "New Folder",
+                ErrorItems = new List<ErrorItem>()
+            };
+            folders.Add(newFolder);
+            AddNavigationViewFolder(newFolder);
+            await SaveDataAsync(cts.Token);
+        }
+
+        // 导航栏中添加新文件夹_UI
+        private void AddNavigationViewFolder(Folder folder)
+        {
+            var newFolder = new NavigationViewItem
+            {
+                Content = folder.FolderName,
+                Icon = new SymbolIcon(Symbol.Comment),
+                Tag = folder
+            };
+            nvSample.MenuItems.Add(newFolder);
         }
 
         // 关于

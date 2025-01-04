@@ -8,6 +8,7 @@ using System.Linq;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using ElectronicCorrectionNotebook.Services;
+using ElectronicCorrectionNotebook.DataStructure;
 using System.Threading.Tasks;
 using Windows.System;
 using System.IO;

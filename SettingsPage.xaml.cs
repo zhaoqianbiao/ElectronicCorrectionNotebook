@@ -1,4 +1,5 @@
 using ElectronicCorrectionNotebook.Services;
+using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

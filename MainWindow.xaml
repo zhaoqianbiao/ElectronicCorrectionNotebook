@@ -72,11 +72,18 @@
 
             <NavigationView.PaneFooter>
                 <StackPanel x:Name="Operations" Orientation="Vertical" Visibility="Visible">
-                    <NavigationViewItem Content="Add" Tapped="Add_Tapped">
+                    <NavigationViewItem Content="AddItems" Tapped="AddItems_Tapped">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE710;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
+
+                    <NavigationViewItem Content="AddFolders" Tapped="AddFolders_Tapped">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE710;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    
                     <NavigationViewItem Content="About" Tapped="About_Tapped">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE946;"/>
