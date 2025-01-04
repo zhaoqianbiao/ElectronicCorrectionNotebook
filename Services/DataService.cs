@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
 using Windows.Storage;
+using System.Threading;
 
 
 
@@ -25,11 +26,11 @@ namespace ElectronicCorrectionNotebook.Services
         }
 
         // 加载数据 反序列化
-        public static async Task<List<ErrorItem>> LoadDataAsync()
+        public static async Task<List<ErrorItem>> LoadDataAsync(CancellationToken token)
         {
             if (File.Exists(filePath))
             {
-                var json = await File.ReadAllTextAsync(filePath);
+                var json = await File.ReadAllTextAsync(filePath, token);
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     return JsonSerializer.Deserialize<List<ErrorItem>>(json);
@@ -39,10 +40,10 @@ namespace ElectronicCorrectionNotebook.Services
         }
 
         // 保存数据 序列化
-        public static async Task SaveDataAsync(List<ErrorItem> errorItems)
+        public static async Task SaveDataAsync(List<ErrorItem> errorItems, CancellationToken token)
         {
             var json = JsonSerializer.Serialize(errorItems);
-            await File.WriteAllTextAsync(filePath, json);
+            await File.WriteAllTextAsync(filePath, json, token);
         }
     }
 }

@@ -42,7 +42,8 @@ namespace ElectronicCorrectionNotebook
             var hwnd = WindowNative.GetWindowHandle(MainWindow);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = AppWindow.GetFromWindowId(windowId);
-            appWindow.Resize(new SizeInt32(1600, 1100)); 
+            appWindow.Resize(new SizeInt32(1600, 1100));
+            
 
             MainWindow.Activate();
         }

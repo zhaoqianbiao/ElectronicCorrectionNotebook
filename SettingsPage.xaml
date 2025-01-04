@@ -7,14 +7,20 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    >
 
+    
     <StackPanel Padding="20">
         <TextBlock Text="Settings 设置" FontSize="25" Margin="0,0,0,20"/>
 
         <TextBlock Text="There is nothing for you." FontSize="15" Margin="0, 0, 0, 20"/>
 
         <Button Content="Export data 导出错题数据" Click="ExportDataButton_Click"/>
-        
+
+        <ComboBox Header="Themes" PlaceholderText="Pick a Theme" Margin="0, 20, 0, 0"  Width="200" x:Name="themeMode">
+            <x:String>Light</x:String>
+            <x:String>Dark</x:String>
+        </ComboBox>
+
     </StackPanel>
 </Page>

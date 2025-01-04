@@ -9,7 +9,49 @@
     mc:Ignorable="d"
     >
 
+    <Window.SystemBackdrop>
+        <MicaBackdrop/>
+    </Window.SystemBackdrop>
+
     <Grid x:Name="rootPanel">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="AppTitleBar" Height="40">
+            <Grid.ColumnDefinitions>
+                <!--左侧拖动区-->
+                <ColumnDefinition x:Name="LeftDragColumn" Width="*"/>
+
+                <!--图标&标题-->
+                <ColumnDefinition x:Name="ComboColumn" Width="Auto"/>
+                
+                <!--右侧拖动区-->
+                <ColumnDefinition x:Name="RightDragColumn" Width="*"/>
+                
+                <!--最右侧三大金刚-->
+                <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                <Image x:Name="TitleBarIcon" 
+                    Source="ms-appx:///Assets/im.ico"
+                    Width="20" Height="20"
+                    VerticalAlignment="Center"
+                />
+                <TextBlock Text="Electronic Correction Notebook"
+                    FontSize="13"
+                    VerticalAlignment="Center"
+                    Margin="10,0,0,0">
+                </TextBlock>        
+            </StackPanel>
+                
+
+
+        </Grid>
+
+        <!-- NavigationView -->
         <NavigationView x:Name="nvSample"
                         IsSettingsVisible="True"
                         IsBackButtonVisible="Collapsed"
@@ -17,23 +59,33 @@
                         SelectionChanged="NavigationView_SelectionChanged"
                         AlwaysShowHeader="True"
                         PaneTitle="Electronic Correction Notebook"
-                        PaneDisplayMode="Left"
-                        ExpandedModeThresholdWidth="500"
+                        PaneDisplayMode="Auto"
+                        ExpandedModeThresholdWidth="850"
+                        CompactModeThresholdWidth="600"
                         SelectionFollowsFocus="Disabled"
-                        IsTabStop="False">
+                        IsTabStop="False"
+                        Margin="0,0,0,0"
+                        Grid.Row="1">
             <NavigationView.MenuItems>
                 <NavigationViewItemHeader Content="Your errors"/>
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
                 <StackPanel x:Name="Operations" Orientation="Vertical" Visibility="Visible">
-                    <NavigationViewItem Icon="Add" Content="Add Questions" Tapped="Add_Tapped"/>
-                    <NavigationViewItem Icon="Accept" Content="About" Tapped="About_Tapped" />
+                    <NavigationViewItem Content="Add" Tapped="Add_Tapped">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE710;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="About" Tapped="About_Tapped">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE946;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
                 </StackPanel>
             </NavigationView.PaneFooter>
 
             <Frame x:Name="contentFrame" />
-            
         </NavigationView>
     </Grid>
 </Window>

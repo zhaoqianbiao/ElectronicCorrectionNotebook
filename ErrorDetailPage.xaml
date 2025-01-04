@@ -7,13 +7,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     x:Name="rootPage"
     >
 
+
     <StackPanel Margin="30,30,30,0" x:Name="rootPanel">
         <Grid>
-            <TextBlock Text="Title 标题" FontSize="20" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal">
+                <FontIcon Glyph="&#xE70F;" />
+                <TextBlock Text="Title 标题" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+            </StackPanel>
             <RatingControl IsClearEnabled="True"
                            x:Name="RatingChoose"
                            IsReadOnly="False" Caption="Importance"
@@ -22,21 +25,28 @@
         <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged" FontSize="15" Margin="0,5,0,10" />
 
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Date 日期" FontSize="20" FontWeight="Bold" />
+            <FontIcon Glyph="&#xE787;" />
+            <TextBlock Text="Date 日期" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
             <DatePicker x:Name="DatePicker" FontSize="15" />
             <Button Content="Today 今天" Click="SetDateToTodayClick" Margin="5,0,0,0"/>
         </StackPanel>
-        
-        <TextBlock Text="Description 详细描述" FontSize="20" FontWeight="Bold"/>
+
+        <StackPanel Orientation="Horizontal">
+            <FontIcon Glyph="&#xE736;" />
+            <TextBlock Text="Description 详细描述" FontSize="21" FontWeight="Bold" Margin="5,0,0,0"/>
+        </StackPanel>
         <TextBox x:Name="DescriptionTextBox" FontSize="15" Margin="0,5,0,15" 
                  AcceptsReturn="True" Height="220" TextWrapping="Wrap" />
 
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Documents 文件" FontSize="20" FontWeight="Bold" Margin="0,2,15,0"/>
+            <FontIcon Glyph="&#xE9F9;" />
+            <TextBlock Text="Documents 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
+            <Button Content="Open from clipboard 剪贴板中打开"  Margin="0,0,10,0"/>
+            <!--Click="OpenFromClipboardClick"-->
             <Button Content="Save all 保存全部" Click="OnSaveClick" Margin="0,0,10,0"/>
         </StackPanel>
         
