@@ -19,39 +19,96 @@ using Rect = Windows.Foundation.Rect;
 using Windows.Foundation;
 using Windows.Graphics;
 using Windows.UI.ViewManagement;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Windows.UI.WindowManagement;
+using System.Runtime.InteropServices;
+using WinRT;
+using PInvoke; // 添加这个引用
 
 namespace ElectronicCorrectionNotebook
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
+
     public sealed partial class MainWindow : Window
     {
         private List<ErrorItem> errorItems;
         private CancellationTokenSource cts;
 
+        private const int MinWidth = 1250;  // 设置最小宽度
+        private const int MinHeight = 1250; // 设置最小高度
+        
+        private Microsoft.UI.Windowing.AppWindow appWindow;
 
         public MainWindow()
         {
             InitializeComponent();
-
+            SubClassing();
             Closed += MainWindow_Closed;
-            CoreApplication.Exiting += OnExiting; 
-            
-            AppWindow.SetIcon("Assets/im.ico");
-            cts = new CancellationTokenSource();
-            errorItems = new List<ErrorItem>(); 
-            _ = LoadDataAsync(cts.Token);
+            CoreApplication.Exiting += OnExiting;
 
+            // 初始化 AppWindow
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+
+            appWindow.SetIcon("Assets/im.ico");
+            cts = new CancellationTokenSource();
+            errorItems = new List<ErrorItem>();
+            _ = LoadDataAsync(cts.Token);
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
-
         }
 
+        private delegate IntPtr WinProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
+        private WinProc newWndProc = null;
+        private IntPtr oldWndProc = IntPtr.Zero;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, User32.WindowLongIndexFlags nIndex, WinProc newProc);
+        [DllImport("user32.dll")]
+        private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
+
+        private void SubClassing()
+        {
+            // Get the Window's HWND
+            var hwnd = this.As<IWindowNative>().WindowHandle;
+
+            newWndProc = new WinProc(NewWindowProc);
+            oldWndProc = SetWindowLongPtr(hwnd, User32.WindowLongIndexFlags.GWL_WNDPROC, newWndProc);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        private IntPtr NewWindowProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam)
+        {
+            switch (Msg)
+            {
+                case User32.WindowMessage.WM_GETMINMAXINFO:
+                    var dpi = User32.GetDpiForWindow(hWnd);
+                    // float scalingFactor = (float)dpi / 96;
+
+                    MINMAXINFO minMaxInfo = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+                    minMaxInfo.ptMinTrackSize.x = (int)(MinWidth);
+                    minMaxInfo.ptMinTrackSize.y = (int)(MinHeight);
+                    Marshal.StructureToPtr(minMaxInfo, lParam, true);
+                    break;
+            }
+            return CallWindowProc(oldWndProc, hWnd, Msg, wParam, lParam);
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
+        internal interface IWindowNative
+        {
+            IntPtr WindowHandle { get; }
+        }
 
         // 加载数据-从json中读取数据
         private async Task LoadDataAsync(CancellationToken token)
@@ -145,7 +202,7 @@ namespace ElectronicCorrectionNotebook
 
             Image aboutImage = new Image()
             {
-                Source = new BitmapImage(new Uri("ms-appx:///Assets/peter.png")), 
+                Source = new BitmapImage(new Uri("ms-appx:///Assets/peter.png")),
                 Width = 100,
                 Height = 100,
                 Margin = new Thickness(0, 10, 0, 0)
@@ -156,7 +213,7 @@ namespace ElectronicCorrectionNotebook
 
             ContentDialog about = new ContentDialog()
             {
-                XamlRoot = this.Content.XamlRoot, 
+                XamlRoot = this.Content.XamlRoot,
                 Title = "About",
                 Content = contentPanel,
                 CloseButtonText = "Ok"
@@ -241,6 +298,5 @@ namespace ElectronicCorrectionNotebook
             await SaveDataAsync(cts.Token);
             cts.Cancel(); // 
         }
-
     }
 }

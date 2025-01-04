@@ -45,13 +45,12 @@
             <FontIcon Glyph="&#xE9F9;" />
             <TextBlock Text="Documents 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
-            <Button Content="Open from clipboard 剪贴板中打开"  Margin="0,0,10,0"/>
-            <!--Click="OpenFromClipboardClick"-->
+            <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
             <Button Content="Save all 保存全部" Click="OnSaveClick" Margin="0,0,10,0"/>
         </StackPanel>
         
         
-        <ScrollViewer Height="250" Margin="0, 10, 0, 10">
+        <ScrollViewer Height="270" Margin="0, 10, 0, 10">
             <ItemsControl x:Name="FilePanel">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -61,9 +60,12 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <ContentDialog x:Name="ImageDialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
+        <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
                        PrimaryButtonClick="OpenIamgeInSystemClick">
-            <Image x:Name="DialogImage" Stretch="Uniform" ManipulationMode="All" />
+            <!--Image x:Name="DialogImage" Stretch="Uniform" ManipulationMode="All"/-->
+            
         </ContentDialog>
+        
+        
     </StackPanel>
 </Page>
