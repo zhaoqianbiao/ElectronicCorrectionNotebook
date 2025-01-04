@@ -29,7 +29,7 @@ namespace ElectronicCorrectionNotebook
 
     public sealed partial class MainWindow : Window
     {
-        private List<ErrorItem> errorItems;
+        private List<ErrorItem> errorItems = new List<ErrorItem>();
         private CancellationTokenSource cts;
 
         private const int MinWidth = 1250;  // 设置最小宽度
@@ -51,13 +51,13 @@ namespace ElectronicCorrectionNotebook
 
             appWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
-            errorItems = new List<ErrorItem>();
             _ = LoadDataAsync(cts.Token);
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
         }
 
+        #region MinMaxCodeRegion
         private delegate IntPtr WinProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
         private WinProc newWndProc = null;
         private IntPtr oldWndProc = IntPtr.Zero;
@@ -110,6 +110,9 @@ namespace ElectronicCorrectionNotebook
             IntPtr WindowHandle { get; }
         }
 
+        #endregion
+
+        
         // 加载数据-从json中读取数据
         private async Task LoadDataAsync(CancellationToken token)
         {
@@ -127,8 +130,14 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                // Handle other exceptions
-                // Log or display the error message
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error 错误",
+                    Content = ex,
+                    CloseButtonText = "Ok",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                var result = await errorDialog.ShowAsync();
             }
         }
 
@@ -145,8 +154,14 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                // Handle other exceptions
-                // Log or display the error message
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error 错误",
+                    Content = ex,
+                    CloseButtonText = "Ok",
+                    XamlRoot = this.Content.XamlRoot
+                };
+                var result = await errorDialog.ShowAsync();
             }
         }
 
@@ -260,6 +275,7 @@ namespace ElectronicCorrectionNotebook
         // 窗口关闭时
         public async void MainWindow_Closed(object sender, WindowEventArgs args)
         {
+            /*
             args.Handled = true;
 
             ContentDialog confirmDialog = new ContentDialog
@@ -280,6 +296,11 @@ namespace ElectronicCorrectionNotebook
                 this.Closed -= MainWindow_Closed;
                 Application.Current.Exit();
             }
+            */
+
+            await SaveCurrentStateAsync();
+            this.Closed -= MainWindow_Closed;
+            Application.Current.Exit();
         }
 
         // 应用程序退出时
@@ -297,6 +318,16 @@ namespace ElectronicCorrectionNotebook
             }
             await SaveDataAsync(cts.Token);
             cts.Cancel(); // 
+        }
+
+        // 删除项
+        public async void RemoveNavigationViewItem(ErrorItem errorItem)
+        {
+            var selectedItem = nvSample.SelectedItem;
+            nvSample.MenuItems.Remove(selectedItem);
+            errorItems.Remove(errorItem);
+            await SaveDataAsync(cts.Token);
+            contentFrame.Content = null;
         }
     }
 }

@@ -39,11 +39,46 @@ namespace ElectronicCorrectionNotebook
         // Textblock类级别字段
         private TextBlock dialogTextBlock;
 
+        private DispatcherTimer _dispatcherTimer;
+        private DateTime _lastSaveTime;
+        private TimeSpan _saveInterval = TimeSpan.FromMinutes(1);
+
         // 初始化页面
         public ErrorDetailPage()
         {
             this.InitializeComponent();
             cts = new CancellationTokenSource();
+            StartAutoSaveTimer();
+        }
+
+        private void StartAutoSaveTimer()
+        {
+            _dispatcherTimer = new DispatcherTimer();
+            _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
+            _dispatcherTimer.Tick += DispatcherTimer_Tick;
+            _dispatcherTimer.Start();
+            _lastSaveTime = DateTime.Now;
+            UpdateAutoSaveText();
+        }
+
+        private async void DispatcherTimer_Tick(object sender, object e)
+        {
+            var timeSinceLastSave = DateTime.Now - _lastSaveTime;
+            if (timeSinceLastSave >= _saveInterval)
+            {
+                // 执行保存操作
+                await SaveCurrentContentAsync();
+                _lastSaveTime = DateTime.Now;
+            }
+            UpdateAutoSaveText();
+        }
+
+        private void UpdateAutoSaveText()
+        {
+            var timeSinceLastSave = DateTime.Now - _lastSaveTime;
+            var timeUntilNextSave = _saveInterval - timeSinceLastSave;
+            var displaytime = ((int)timeUntilNextSave.TotalSeconds / 10) * 10;
+            saveTimeTextBlock.Text = $"Auto save in about {displaytime} s";
         }
 
         // 导航到页面 绑定数据到UI控件
@@ -69,7 +104,8 @@ namespace ElectronicCorrectionNotebook
             {
                 var picker = new FileOpenPicker
                 {
-                    SuggestedStartLocation = PickerLocationId.Desktop
+                    SuggestedStartLocation = PickerLocationId.Desktop,
+                    CommitButtonText = "Upload 上传",
                 };
                 picker.FileTypeFilter.Add("*");
 
@@ -161,6 +197,16 @@ namespace ElectronicCorrectionNotebook
                     Tag = filePath, // 将文件路径存储在Tag中，即使是文件图标，也会传递着文件的路径
                 };
                 image.Tapped += File_Tapped;
+
+                // 创建右键菜单
+                var contextMenu = new MenuFlyout();
+                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除" };
+                deleteItem.Click += (sender, e) => DeleteImage(filePath);
+                contextMenu.Items.Add(deleteItem);
+
+                // 设置右键菜单
+                image.ContextFlyout = contextMenu;
+
                 var fileNameBlock = new TextBlock
                 {
                     Text = fileName,
@@ -178,6 +224,26 @@ namespace ElectronicCorrectionNotebook
                 contentPanel.Margin = new Thickness(5);
                 FilePanel.Items.Add(contentPanel);
             }
+        }
+
+        // 右键删除单个文件
+        private async void DeleteImage(string filePath)
+        {
+            // 从 ErrorItem.FilePaths 中移除文件路径
+            ErrorItem.FilePaths.Remove(filePath);
+            var errorItems = await DataService.LoadDataAsync(cts.Token);
+            var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
+            if (existingItem != null)
+            {
+                existingItem.FilePaths = ErrorItem.FilePaths;
+            }
+            else
+            {
+                errorItems.Add(ErrorItem);
+            }
+            await DataService.SaveDataAsync(errorItems, cts.Token);
+            // 重新显示文件图标
+            DisplayFilesIcon();
         }
 
         // 点击图片放大
@@ -279,7 +345,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 点击保存数据
+        // 点击保存页面
         private async void OnSaveClick(object sender, RoutedEventArgs e)
         {
             try
@@ -301,6 +367,54 @@ namespace ElectronicCorrectionNotebook
             {
                 // 处理异常，例如记录日志或显示错误消息
                 await ShowErrorMessageAsync("Error saving content", ex.Message);
+            }
+        }
+
+        // 点击删除页面
+        private async void DeleteClick(object sender, RoutedEventArgs e)
+        {
+            ContentDialog confirmDialog = new ContentDialog
+            {
+                Title = "Confirm to delete 确认删除",
+                Content = "Are you sure to delete this page forever? 你确定要删除这一页吗？",
+                PrimaryButtonText = "Yes 是",
+                CloseButtonText = "No 否",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.Content.XamlRoot
+            };
+            PublicEvents.PlaySystemSound();
+            var result = await confirmDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                try
+                {
+                    var errorItems = await DataService.LoadDataAsync(cts.Token);        // 取出总的errorItems List
+                    var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);      // 在List中寻找和当前ErrorItem ID匹配的
+                    if (existingItem != null)
+                    {
+                        errorItems.Remove(existingItem);        // 删去当前的那个item
+                    }
+                    await DataService.SaveDataAsync(errorItems, cts.Token);     // 保存errorItems List
+
+                    var mainWindow = (MainWindow)App.MainWindow;
+                    mainWindow.RemoveNavigationViewItem(ErrorItem);     // 给navigationView传递要删除的当前的ErrorItem
+
+                    ContentDialog deleteSuccess = new ContentDialog()
+                    {
+                        XamlRoot = rootPanel.XamlRoot,
+                        Title = "Deleted 已删除",
+                        Content = "Delete successfully 删除成功！",
+                        CloseButtonText = "Ok",
+                        DefaultButton = ContentDialogButton.Close,
+                    };
+                    PublicEvents.PlaySystemSound();
+                    await deleteSuccess.ShowAsync();
+                }
+                catch (Exception ex)
+                {
+                    // 处理异常，例如记录日志或显示错误消息
+                    await ShowErrorMessageAsync("Error deleting content", ex.Message);
+                }
             }
         }
 
