@@ -117,7 +117,7 @@
         </ScrollViewer>
 
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
-                       PrimaryButtonClick="OpenIamgeInSystemClick">
+                       PrimaryButtonClick="OpenFileInSystemClick">
 
         </ContentDialog>
         

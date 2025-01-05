@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ElectronicCorrectionNotebook
+namespace ElectronicCorrectionNotebook.DataStructure
 {
     public class ErrorItem
     {

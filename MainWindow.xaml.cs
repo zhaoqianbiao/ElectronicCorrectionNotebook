@@ -22,7 +22,8 @@ using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using System.Runtime.InteropServices;
 using WinRT;
-using PInvoke; // 添加这个引用
+using PInvoke;
+using ElectronicCorrectionNotebook.DataStructure;
 
 namespace ElectronicCorrectionNotebook
 {
@@ -205,7 +206,18 @@ namespace ElectronicCorrectionNotebook
                 Margin = new Thickness(0, 10, 0, 0)
             };
 
-            aboutInfo.Inlines.Add(new Run { Text = "Created by ", Foreground = new SolidColorBrush(Microsoft.UI.Colors.Black) });
+
+            SolidColorBrush color = null;
+            if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
+            {
+                color = new SolidColorBrush(Colors.White);
+            }
+            else
+            {
+                color = new SolidColorBrush(Colors.Black);
+            }
+
+            aboutInfo.Inlines.Add(new Run { Text = "Created by ", Foreground = color });
 
             Hyperlink hyperlink = new Hyperlink();
             hyperlink.Inlines.Add(new Run { Text = "@QuincyZhao😀" });
@@ -213,7 +225,7 @@ namespace ElectronicCorrectionNotebook
             hyperlink.Foreground = new SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
 
             aboutInfo.Inlines.Add(hyperlink);
-            aboutInfo.Inlines.Add(new Run { Text = " in GCGS", Foreground = new SolidColorBrush(Microsoft.UI.Colors.Black) });
+            aboutInfo.Inlines.Add(new Run { Text = " in GCGS", Foreground = color });
 
             Image aboutImage = new Image()
             {

@@ -1,37 +1,46 @@
+using ElectronicCorrectionNotebook.DataStructure;
 using ElectronicCorrectionNotebook.Services;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace ElectronicCorrectionNotebook
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class SettingsPage : Page
     {
         private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
         private const string settingsFileName = "settings.json";
         private Window mainWindow;
+        private Application application;
 
         public SettingsPage()
         {
             this.InitializeComponent();
             mainWindow = App.MainWindow;
+            application = App.Current;
 
             // 确保应用目录存在
             if (!Directory.Exists(appDataPath))
             {
                 Directory.CreateDirectory(appDataPath);
+            }
+
+            this.Loaded += SettingsPage_Loaded;
+        }
+
+        private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 调试代码，检查 XamlRoot 是否正确
+            if (this.XamlRoot == null)
+            {
+                throw new InvalidOperationException("XamlRoot is null. Ensure the page is properly initialized.");
             }
 
             LoadSettingsAsync();
@@ -46,7 +55,11 @@ namespace ElectronicCorrectionNotebook
                 if (File.Exists(settingsFilePath))
                 {
                     string json = await File.ReadAllTextAsync(settingsFilePath);
-                    // 解析 JSON 并加载设置
+                    var settings = JsonSerializer.Deserialize<Settings>(json);
+
+                    // 加载设置到UI
+                    // themeMode.SelectedItem = settings.Theme;
+
                 }
             }
             catch (FileNotFoundException)
@@ -55,6 +68,40 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
+        // 保存设置
+        /*
+        private async void SaveSettingsAsync()
+        {
+            try
+            {
+                var settings = new Settings
+                {
+                    Theme = themeMode.SelectedItem.ToString()
+                };
+
+                string json = JsonSerializer.Serialize(settings);
+                string settingsFilePath = Path.Combine(appDataPath, settingsFileName);
+                await File.WriteAllTextAsync(settingsFilePath, json);
+
+                // 切换应用程序主题
+                if (settings.Theme == "Dark")
+                {
+                    ((App)Application.Current).SetAppTheme(ApplicationTheme.Dark);
+                }
+                else
+                {
+                    ((App)Application.Current).SetAppTheme(ApplicationTheme.Light);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 处理异常，例如记录日志或显示错误消息
+                await ShowErrorMessageAsync("Error saving settings", ex);
+            }
+        }
+        */
+
+        // 导出数据
         private async void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var folderPicker = new FolderPicker();
@@ -80,10 +127,10 @@ namespace ElectronicCorrectionNotebook
                 };
                 PublicEvents.PlaySystemSound();
                 await successDialog.ShowAsync();
-                
             }
         }
 
+        // 复制文件夹
         private async Task CopyFolderContentsAsync(StorageFolder sourceFolder, StorageFolder destinationFolder)
         {
             foreach (StorageFile file in await sourceFolder.GetFilesAsync())
@@ -97,7 +144,37 @@ namespace ElectronicCorrectionNotebook
                 await CopyFolderContentsAsync(folder, newFolder);
             }
         }
-    
-        
+
+        // 显示错误消息
+        private async Task ShowErrorMessageAsync(string title, Exception ex)
+        {
+            var errorDialog = new ContentDialog()
+            {
+                Title = title,
+                Content = $"{ex.Message}\n\n{ex.StackTrace}",
+                CloseButtonText = "Ok 确定",
+                XamlRoot = this.XamlRoot, // 确保使用当前页面的 XamlRoot
+            };
+            await errorDialog.ShowAsync();
+        }
+
+        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch themeToggleSwitch = sender as ToggleSwitch;
+            if (themeToggleSwitch.IsOn)
+            {
+                if (mainWindow.Content is FrameworkElement rootElement)
+                {
+                    rootElement.RequestedTheme = ElementTheme.Dark;
+                }
+            }
+            else
+            {
+                if (mainWindow.Content is FrameworkElement rootElement)
+                {
+                    rootElement.RequestedTheme = ElementTheme.Light;
+                }
+            }
+        }
     }
 }

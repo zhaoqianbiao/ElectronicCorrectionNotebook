@@ -17,20 +17,18 @@ using static System.Net.Mime.MediaTypeNames;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using WinRT.Interop;
-
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Windows.Media.Playback;
+using Windows.Media.Core;
+using System.Diagnostics;
+using ElectronicCorrectionNotebook.DataStructure;
 
 namespace ElectronicCorrectionNotebook
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ErrorDetailPage : Page
     {
         //创建错题对象
         public ErrorItem ErrorItem { get; set; }
+        // 数据路径
         private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
         private CancellationTokenSource cts;
 
@@ -38,7 +36,10 @@ namespace ElectronicCorrectionNotebook
         private Microsoft.UI.Xaml.Controls.Image dialogImage; 
         // Textblock类级别字段
         private TextBlock dialogTextBlock;
+        // MediaPlayerElement类级别字段
+        private MediaPlayerElement dialogMediaPlayer;
 
+        // 计时器保存
         private DispatcherTimer _dispatcherTimer;
         private DateTime _lastSaveTime;
         private TimeSpan _saveInterval = TimeSpan.FromMinutes(1);
@@ -48,7 +49,7 @@ namespace ElectronicCorrectionNotebook
         {
             this.InitializeComponent();
             cts = new CancellationTokenSource();
-            StartAutoSaveTimer();
+            // StartAutoSaveTimer();
         }
 
         private void StartAutoSaveTimer()
@@ -121,16 +122,23 @@ namespace ElectronicCorrectionNotebook
                     foreach (var file in files)
                     {
                         var destinationPath = Path.Combine(filesFolder, file.Name);
-                        await file.CopyAsync(await StorageFolder.GetFolderFromPathAsync(filesFolder), file.Name, NameCollisionOption.ReplaceExisting);
+                        // 检查目标文件是否存在，避免覆盖
+                        if (File.Exists(destinationPath))
+                        {
+                            string uniqueFileName = $"{Path.GetFileNameWithoutExtension(file.Name)}_{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+                            destinationPath = Path.Combine(filesFolder, uniqueFileName);
+                        }
+                        await file.CopyAsync(await StorageFolder.GetFolderFromPathAsync(filesFolder), Path.GetFileName(destinationPath), NameCollisionOption.GenerateUniqueName);
                         ErrorItem.FilePaths.Add(destinationPath);
                     }
                     DisplayFilesIcon();
+                    await SaveCurrentContentAsync();
                 }
             }
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error selecting files", ex.Message);
+                await ShowErrorMessageAsync("Error selecting files", ex);
             }
         }
 
@@ -174,6 +182,7 @@ namespace ElectronicCorrectionNotebook
                         break;
                     case ".mp3":
                     case ".mp4":
+                    case ".mkv":
                         bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/video.png"));
                         break;
                     case ".jpg":
@@ -200,6 +209,13 @@ namespace ElectronicCorrectionNotebook
 
                 // 创建右键菜单
                 var contextMenu = new MenuFlyout();
+
+                // 菜单1 复制文件
+                var copyItem = new MenuFlyoutItem { Text = "Copy 复制" };
+                copyItem.Click += (sender, e) => CopyFile(filePath);
+                contextMenu.Items.Add(copyItem);
+
+                // 菜单2 删除
                 var deleteItem = new MenuFlyoutItem { Text = "Delete 删除" };
                 deleteItem.Click += (sender, e) => DeleteImage(filePath);
                 contextMenu.Items.Add(deleteItem);
@@ -226,27 +242,64 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 右键删除单个文件
+        // 右键菜单 删除单个文件
         private async void DeleteImage(string filePath)
         {
-            // 从 ErrorItem.FilePaths 中移除文件路径
-            ErrorItem.FilePaths.Remove(filePath);
-            var errorItems = await DataService.LoadDataAsync(cts.Token);
-            var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
-            if (existingItem != null)
+            try
             {
-                existingItem.FilePaths = ErrorItem.FilePaths;
+                // 从 ErrorItem.FilePaths 中移除文件路径
+                ErrorItem.FilePaths.Remove(filePath);
+
+                // 删除本地文件
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                var errorItems = await DataService.LoadDataAsync(cts.Token);
+                var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
+                if (existingItem != null)
+                {
+                    existingItem.FilePaths = ErrorItem.FilePaths;
+                }
+                else
+                {
+                    errorItems.Add(ErrorItem);
+                }
+                await DataService.SaveDataAsync(errorItems, cts.Token);
+
+                // 重新显示文件图标
+                DisplayFilesIcon();
+                SaveCurrentContentAsync();
             }
-            else
+            catch (Exception ex)
             {
-                errorItems.Add(ErrorItem);
+                await ShowErrorMessageAsync("Error deleting image", ex);
             }
-            await DataService.SaveDataAsync(errorItems, cts.Token);
-            // 重新显示文件图标
-            DisplayFilesIcon();
         }
 
-        // 点击图片放大
+        // 右键菜单 复制单个文件
+        private async void CopyFile(string filePath)
+        {
+            try
+            {
+                var file = await StorageFile.GetFileFromPathAsync(filePath);
+                if (file == null)
+                {
+                    throw new FileNotFoundException("File not found.", filePath);
+                }
+
+                var dataPackage = new DataPackage();
+                dataPackage.SetStorageItems(new List<IStorageItem> { file });
+                Clipboard.SetContent(dataPackage);
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessageAsync("Error copying file", ex);
+            }
+        }
+
+        // 点击文件图标
         private async void File_Tapped(object sender, TappedRoutedEventArgs e)
         {
             try
@@ -254,6 +307,7 @@ namespace ElectronicCorrectionNotebook
                 if (sender is Microsoft.UI.Xaml.Controls.Image image && image.Tag is string filePath)
                 {
                     var fileType = Path.GetExtension(filePath).ToLower();
+                    // 显示预览图片
                     if (fileType == ".jpg" || fileType == ".jpeg" || fileType == ".png" || fileType == ".bmp" || fileType == ".gif" || fileType == ".ico")
                     {
                         BitmapImage bitmap = new BitmapImage(new Uri(filePath, UriKind.RelativeOrAbsolute));
@@ -265,43 +319,55 @@ namespace ElectronicCorrectionNotebook
                             ManipulationMode = ManipulationModes.All,
                         };
                         Dialog.Content = dialogImage;
-                        /*DialogImage.Source = new BitmapImage(new Uri(filePath));
-                        DialogImage.Tag = filePath;*/
 
+                        await Dialog.ShowAsync();
+                    }
+                    // 显示预览txt文件
+                    else if (fileType == ".txt")
+                    {
+                        var file = await StorageFile.GetFileFromPathAsync(filePath);
+                        var texts = await FileIO.ReadTextAsync(file);
+                        dialogTextBlock = new TextBlock()
+                        {
+                            Text = texts,
+                            Tag = filePath,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(10),
+                            IsTextSelectionEnabled = true,
+                        };
+
+                        var textBlockScrollViewer = new ScrollViewer
+                        {
+                            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                            Content = dialogTextBlock,
+                        };
+
+                        Dialog.Content = textBlockScrollViewer;
+                        await Dialog.ShowAsync();
+                    }
+                    // 预览播放视频或音频
+                    else if (fileType == ".mp3" || fileType == ".mp4" || fileType == ".mkv")
+                    {
+                        var file = await StorageFile.GetFileFromPathAsync(filePath);
+
+                        dialogMediaPlayer = new MediaPlayerElement
+                        {
+                            AreTransportControlsEnabled = true,
+                            Source = MediaSource.CreateFromUri(new Uri(filePath)),
+                            AutoPlay = false,
+                            Height = Double.NaN,
+                            Tag = filePath
+                        };
+                        Dialog.Content = dialogMediaPlayer;
+                        Dialog.Closed += mediaDialog_Closed;
                         await Dialog.ShowAsync();
                     }
                     else
                     {
-                        if (fileType == ".txt")
+                        var file = await StorageFile.GetFileFromPathAsync(filePath);
+                        if (file != null)
                         {
-                            var file = await StorageFile.GetFileFromPathAsync(filePath);
-                            var texts = await FileIO.ReadTextAsync(file);
-                            dialogTextBlock = new TextBlock()
-                            {
-                                Text = texts,
-                                Tag = filePath,
-                                TextWrapping = TextWrapping.Wrap,
-                                Margin = new Thickness(10),
-                                IsTextSelectionEnabled = true,
-                                
-                            };
-
-                            var textBlockScrollViewer = new ScrollViewer
-                            {
-                                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                                Content = dialogTextBlock,
-                            };
-
-                            Dialog.Content = textBlockScrollViewer;
-                            await Dialog.ShowAsync();
-                        }
-                        else
-                        {
-                            var file = await StorageFile.GetFileFromPathAsync(filePath);
-                            if (file != null)
-                            {
-                                await Launcher.LaunchFileAsync(file);
-                            }
+                            await Launcher.LaunchFileAsync(file);
                         }
                     }
                 }
@@ -309,17 +375,36 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening file", ex.Message);
+                await ShowErrorMessageAsync("Error opening file", ex);
+            }
+        }
+
+        // 关掉媒体播放对话框
+        private void mediaDialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            if (dialogMediaPlayer != null)
+            {
+                var playbackState = dialogMediaPlayer.MediaPlayer.PlaybackSession.PlaybackState;
+                /*
+                // 如果当前没有暂停，就暂停播放 
+                if (playbackState != MediaPlaybackState.Paused)
+                {
+                    dialogMediaPlayer.MediaPlayer.Pause();
+                }
+                */
+                dialogMediaPlayer.MediaPlayer.Pause();
             }
         }
 
         // 以默认方式打开
-        private async void OpenIamgeInSystemClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void OpenFileInSystemClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             try
             {
                 string filePath = null;
-
+                // 有问题了!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // 需要在每次的dialog关闭的时候，把dialogImage、dialogTextBlock、dialogMediaPlayer置空
+                // 不然dialogImage每次都会覆盖下面的textblock和mediaplayer
                 if (dialogImage != null && dialogImage.Tag is string imagePath)
                 {
                     filePath = imagePath;
@@ -328,8 +413,12 @@ namespace ElectronicCorrectionNotebook
                 {
                     filePath = textBlockPath;
                 }
+                else if (dialogMediaPlayer != null && dialogMediaPlayer.Tag is string mediaPath)
+                {
+                    filePath = mediaPath;
+                }
 
-                if (filePath != null) 
+                if (filePath != null)
                 {
                     var file = await StorageFile.GetFileFromPathAsync(filePath);
                     if (file != null)
@@ -341,7 +430,14 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening image in system", ex.Message);
+                await ShowErrorMessageAsync("Error opening image in system", ex);
+            }
+            finally
+            {
+                // !!!!!!!!!!!重要！！
+                dialogImage = null;
+                dialogTextBlock = null;
+                dialogMediaPlayer = null;
             }
         }
 
@@ -366,7 +462,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error saving content", ex.Message);
+                await ShowErrorMessageAsync("Error saving content", ex);
             }
         }
 
@@ -388,16 +484,25 @@ namespace ElectronicCorrectionNotebook
             {
                 try
                 {
-                    var errorItems = await DataService.LoadDataAsync(cts.Token);        // 取出总的errorItems List
-                    var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);      // 在List中寻找和当前ErrorItem ID匹配的
+                    // 删除本地文件
+                    foreach (var filePath in ErrorItem.FilePaths)
+                    {
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
+
+                    var errorItems = await DataService.LoadDataAsync(cts.Token); // 取出总的errorItems List
+                    var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id); // 在List中寻找和当前ErrorItem ID匹配的
                     if (existingItem != null)
                     {
-                        errorItems.Remove(existingItem);        // 删去当前的那个item
+                        errorItems.Remove(existingItem); // 删去当前的那个item
                     }
-                    await DataService.SaveDataAsync(errorItems, cts.Token);     // 保存errorItems List
+                    await DataService.SaveDataAsync(errorItems, cts.Token); // 保存errorItems List
 
                     var mainWindow = (MainWindow)App.MainWindow;
-                    mainWindow.RemoveNavigationViewItem(ErrorItem);     // 给navigationView传递要删除的当前的ErrorItem
+                    mainWindow.RemoveNavigationViewItem(ErrorItem); // 给navigationView传递要删除的当前的ErrorItem
 
                     ContentDialog deleteSuccess = new ContentDialog()
                     {
@@ -413,7 +518,7 @@ namespace ElectronicCorrectionNotebook
                 catch (Exception ex)
                 {
                     // 处理异常，例如记录日志或显示错误消息
-                    await ShowErrorMessageAsync("Error deleting content", ex.Message);
+                    await ShowErrorMessageAsync("Error deleting content", ex);
                 }
             }
         }
@@ -459,7 +564,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理其他异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error saving data", ex.Message);
+                await ShowErrorMessageAsync("Error saving data", ex);
             }
         }
 
@@ -474,20 +579,6 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 显示错误消息
-        private async Task ShowErrorMessageAsync(string title, string message)
-        {
-            ContentDialog errorDialog = new ContentDialog()
-            {
-                XamlRoot = rootPanel.XamlRoot,
-                Title = title,
-                Content = message,
-                CloseButtonText = "Ok",
-                DefaultButton = ContentDialogButton.Close,
-            };
-            await errorDialog.ShowAsync();
-        }
-
         // 从剪切板上传玩意儿
         private async void OpenFromClipboardClick(object sender, RoutedEventArgs e)
         {
@@ -498,28 +589,44 @@ namespace ElectronicCorrectionNotebook
                 Directory.CreateDirectory(filesFolder);
 
                 var dataPackageView = Clipboard.GetContent();
+                if (dataPackageView == null)
+                {
+                    throw new InvalidOperationException("Clipboard content is null.");
+                }
+
                 // 获取（多个）文件
                 if (dataPackageView.Contains(StandardDataFormats.StorageItems))
                 {
                     var items = await dataPackageView.GetStorageItemsAsync();
                     if (items.Count > 0)
                     {
-                        foreach(var item in items)
+                        foreach (var item in items)
                         {
                             var storageFile = item as StorageFile;
                             if (storageFile != null)
                             {
-                                string uniqueFileName = $"{storageFile.Name}";
+                                string destinationPath = Path.Combine(filesFolder, storageFile.Name);
+
+                                // 检查目标文件是否存在，避免覆盖
+                                if (File.Exists(destinationPath))
+                                {
+                                    string uniqueFileName = $"{Path.GetFileNameWithoutExtension(storageFile.Name)}_{Guid.NewGuid()}{Path.GetExtension(storageFile.Name)}";
+                                    destinationPath = Path.Combine(filesFolder, uniqueFileName);
+                                }
+
+                                /*
+                                // string uniqueFileName = $"{storageFile.Name}";
+                                string uniqueFileName = $"{Guid.NewGuid()}_{storageFile.Name}";
                                 string destinationPath = Path.Combine(filesFolder, uniqueFileName);
+                                */
+
                                 await SaveFileToFixedPathAsync(storageFile, destinationPath);
                                 ErrorItem.FilePaths.Add(destinationPath);
                             }
-
                         }
                         DisplayFilesIcon();
                     }
                 }
-
                 // 获取截图
                 else if (dataPackageView.Contains(StandardDataFormats.Bitmap))
                 {
@@ -536,7 +643,6 @@ namespace ElectronicCorrectionNotebook
                         DisplayFilesIcon();
                     }
                 }
-
                 // 获取复制的文本
                 else if (dataPackageView.Contains(StandardDataFormats.Text))
                 {
@@ -550,7 +656,6 @@ namespace ElectronicCorrectionNotebook
                         DisplayFilesIcon();
                     }
                 }
-
                 else
                 {
                     var dialog = new ContentDialog
@@ -562,21 +667,36 @@ namespace ElectronicCorrectionNotebook
                     };
                     await dialog.ShowAsync();
                 }
+                await SaveCurrentContentAsync();
             }
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening from clipboard", ex.Message);
+                await ShowErrorMessageAsync("Error opening from clipboard", ex);
             }
+        }
+
+        // 显示错误消息
+        private async Task ShowErrorMessageAsync(string title, Exception ex)
+        {
+            var errorDialog = new ContentDialog()
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = title,
+                Content = ex.Message,
+                CloseButtonText = "Ok 确定"
+            };
+            await errorDialog.ShowAsync();
         }
 
         // 把剪切板的文件复制到Files文件夹（可操作任意文件）
         private async Task SaveFileToFixedPathAsync(StorageFile sourceFile, string destinationPath)
         {
+            
             var destinationFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(destinationPath));
             var destinationFile = await destinationFolder.CreateFileAsync(Path.GetFileName(destinationPath), CreationCollisionOption.ReplaceExisting);
-
             await sourceFile.CopyAndReplaceAsync(destinationFile);
+            
 
             /*
             var dialog = new ContentDialog
