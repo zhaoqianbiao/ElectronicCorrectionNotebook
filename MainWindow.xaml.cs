@@ -185,7 +185,7 @@ namespace ElectronicCorrectionNotebook
             {
                 Title = "New Error",
                 Date = DateTime.Now,
-                Description = "Description...",
+                Description = @"{\rtf1\ansi\ansicpg1252\uc1\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}}", // 初始化为一个空的 RTF 文档
                 FilePaths = new List<string>(),
                 Rating = -1,
             };

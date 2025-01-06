@@ -83,7 +83,7 @@ namespace ElectronicCorrectionNotebook
         }
 
         // 导航到页面 绑定数据到UI控件
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             ErrorItem = e.Parameter as ErrorItem;
@@ -92,7 +92,27 @@ namespace ElectronicCorrectionNotebook
                 // 绑定数据到UI控件
                 TitleTextBox.Text = ErrorItem.Title;
                 DatePicker.Date = ErrorItem.Date;
-                DescriptionTextBox.Text = ErrorItem.Description;
+
+                // 加载富文本框的内容
+                if (!string.IsNullOrEmpty(ErrorItem.Description))
+                {
+                    using (var stream = new InMemoryRandomAccessStream())
+                    {
+                        using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
+                        {
+                            writer.WriteString(ErrorItem.Description);
+                            await writer.StoreAsync();
+                        }
+                        stream.Seek(0);
+                        DescriptionRichEditBox.Document.LoadFromStream(Microsoft.UI.Text.TextSetOptions.FormatRtf, stream);
+                    }
+                }
+                else
+                {
+                    // 初始化为一个空的 RTF 文档
+                    DescriptionRichEditBox.Document.SetText(Microsoft.UI.Text.TextSetOptions.FormatRtf, @"{\rtf1\ansi\ansicpg1252\uc1\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}}");
+                }
+
                 RatingChoose.Value = ErrorItem.Rating;
                 DisplayFilesIcon();
             }
@@ -536,11 +556,25 @@ namespace ElectronicCorrectionNotebook
             // 保存到对象
             ErrorItem.Title = TitleTextBox.Text;
             ErrorItem.Date = DatePicker.Date.DateTime;
-            ErrorItem.Description = DescriptionTextBox.Text;
             ErrorItem.Rating = RatingChoose.Value;
 
             try
             {
+                // 保存 RichEditBox 的内容到 RTF 格式的字符串
+                string rtfText;
+                using (var stream = new InMemoryRandomAccessStream())
+                {
+                    DescriptionRichEditBox.Document.SaveToStream(Microsoft.UI.Text.TextGetOptions.FormatRtf, stream);
+                    using (var reader = new DataReader(stream.GetInputStreamAt(0)))
+                    {
+                        await reader.LoadAsync((uint)stream.Size);
+                        rtfText = reader.ReadString((uint)stream.Size);
+                    }
+                }
+
+                // 更新 ErrorItem 的 Description
+                ErrorItem.Description = rtfText;
+
                 var errorItems = await DataService.LoadDataAsync(cts.Token);
                 var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
                 if (existingItem != null)
