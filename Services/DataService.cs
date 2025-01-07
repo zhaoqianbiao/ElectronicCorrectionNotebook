@@ -7,15 +7,16 @@ using Windows.Storage;
 using System.Threading;
 using ElectronicCorrectionNotebook.DataStructure;
 
-
-
-
 namespace ElectronicCorrectionNotebook.Services
 {
     public static class DataService
     {
+        // Data文件夹
         private static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
-        private static readonly string filePath = Path.Combine(appDataPath, "errors.json");
+        // json文本文件路径
+        private static readonly string JsonFilePath = Path.Combine(appDataPath, "errors.json");
+        // rtf富文本路径
+        private static readonly string rtfPath = Path.Combine(appDataPath, "rtfFiles");
 
         static DataService()
         {
@@ -24,14 +25,18 @@ namespace ElectronicCorrectionNotebook.Services
             {
                 Directory.CreateDirectory(appDataPath);
             }
+            else if (!Directory.Exists(rtfPath))
+            {
+                Directory.CreateDirectory(rtfPath);
+            }
         }
 
         // 加载数据 反序列化
         public static async Task<List<ErrorItem>> LoadDataAsync(CancellationToken token)
         {
-            if (File.Exists(filePath))
+            if (File.Exists(JsonFilePath))
             {
-                var json = await File.ReadAllTextAsync(filePath, token);
+                var json = await File.ReadAllTextAsync(JsonFilePath, token);
                 if (!string.IsNullOrWhiteSpace(json))
                 {
                     return JsonSerializer.Deserialize<List<ErrorItem>>(json);
@@ -44,7 +49,7 @@ namespace ElectronicCorrectionNotebook.Services
         public static async Task SaveDataAsync(List<ErrorItem> errorItems, CancellationToken token)
         {
             var json = JsonSerializer.Serialize(errorItems);
-            await File.WriteAllTextAsync(filePath, json, token);
+            await File.WriteAllTextAsync(JsonFilePath, json, token);
         }
     }
 }

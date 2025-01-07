@@ -59,15 +59,163 @@
             <Button Content="Today 今天" Click="SetDateToTodayClick" Margin="5,0,0,0"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
-            <FontIcon Glyph="&#xE736;" />
-            <TextBlock Text="Description 详细描述" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
-        </StackPanel>
-        <!--TextBox x:Name="DescriptionTextBox" FontSize="15" Margin="0,5,0,15" 
-                 AcceptsReturn="True" Height="220" TextWrapping="Wrap" /-->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <RichEditBox x:Name="DescriptionRichEditBox" FontSize="15" Margin="0,5,0,15" 
-                 AcceptsReturn="True" Height="220" TextWrapping="Wrap" />
+            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+                <FontIcon Glyph="&#xE736;"/>
+                <TextBlock Text="Description 详细描述" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button AutomationProperties.Name="Bold" ToolTipService.ToolTip="Bold" Click="BoldButton_Click">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE8DD;"/>
+                    </Button.Content>
+                </Button>
+
+                <Button x:Name="italicButton" Click="ItalicButton_Click" AutomationProperties.Name="Italic" ToolTipService.ToolTip="Italic"
+                        Margin="10,0,0,0">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE8DB;"/>
+                    </Button.Content>
+                </Button>
+
+                <Button x:Name="underlineButton" Click="UnderlineButton_Click" AutomationProperties.Name="Underline" ToolTipService.ToolTip="Underline"
+                        Margin="10,0,0,0">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE8DC;"/>
+                    </Button.Content>
+                </Button>
+
+                <DropDownButton x:Name="highlightButton" AutomationProperties.Name="High Light"
+                        BorderThickness="0" ToolTipService.ToolTip="Font color"
+                        Background="Transparent" Margin="10,0,0,0">
+                    <Button.Content>
+                        <FontIcon Glyph="&#xE7E7;"/>
+                    </Button.Content>
+                    <DropDownButton.Flyout>
+                        <Flyout Placement="Bottom">
+                            <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
+                                <VariableSizedWrapGrid.Resources>
+                                    <Style TargetType="Rectangle">
+                                        <Setter Property="Width" Value="32"/>
+                                        <Setter Property="Height" Value="32"/>
+                                    </Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="MinHeight" Value="0"/>
+                                        <Setter Property="Margin" Value="6"/>
+                                    </Style>
+                                </VariableSizedWrapGrid.Resources>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Transparent">
+                                    <Button.Content>
+                                        <Rectangle Fill="Transparent"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Red">
+                                    <Button.Content>
+                                        <Rectangle Fill="Red"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Orange">
+                                    <Button.Content>
+                                        <Rectangle Fill="Orange"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Yellow">
+                                    <Button.Content>
+                                        <Rectangle Fill="Yellow"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Green">
+                                    <Button.Content>
+                                        <Rectangle Fill="Green"/>
+                                    </Button.Content>
+                                </Button>
+                            </VariableSizedWrapGrid>
+                        </Flyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <DropDownButton x:Name="fontColorButton" AutomationProperties.Name="Font color"
+                                BorderThickness="0" ToolTipService.ToolTip="Font color"
+                                Background="Transparent" Margin="10,0,0,0">
+                    <SymbolIcon Symbol="FontColor"/>
+                    <DropDownButton.Flyout>
+                        <Flyout Placement="Bottom">
+                            <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
+                                <VariableSizedWrapGrid.Resources>
+                                    <Style TargetType="Rectangle">
+                                        <Setter Property="Width" Value="32"/>
+                                        <Setter Property="Height" Value="32"/>
+                                    </Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="MinHeight" Value="0"/>
+                                        <Setter Property="Margin" Value="6"/>
+                                    </Style>
+                                </VariableSizedWrapGrid.Resources>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="White">
+                                    <Button.Content>
+                                        <Rectangle Fill="White"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Black">
+                                    <Button.Content>
+                                        <Rectangle Fill="Black"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Red">
+                                    <Button.Content>
+                                        <Rectangle Fill="Red"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Orange">
+                                    <Button.Content>
+                                        <Rectangle Fill="Orange"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Yellow">
+                                    <Button.Content>
+                                        <Rectangle Fill="Yellow"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Green">
+                                    <Button.Content>
+                                        <Rectangle Fill="Green"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Indigo">
+                                    <Button.Content>
+                                        <Rectangle Fill="Indigo"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Violet">
+                                    <Button.Content>
+                                        <Rectangle Fill="Violet"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Gray">
+                                    <Button.Content>
+                                        <Rectangle Fill="Gray"/>
+                                    </Button.Content>
+                                </Button>
+                            </VariableSizedWrapGrid>
+                        </Flyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </StackPanel>
+            
+        </Grid>
+
+        <RichEditBox x:Name="DescriptionRichEditBox"
+                     FontSize="15" Margin="0,5,0,15" AcceptsReturn="True" Height="240" TextWrapping="Wrap"/>
 
         <StackPanel Orientation="Horizontal">
             <FontIcon Glyph="&#xE9F9;" />
@@ -75,7 +223,6 @@
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
             <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
         </StackPanel>
-        
         
         <ScrollViewer Height="270" Margin="0, 10, 0, 10">
             <ItemsControl x:Name="FilePanel">
@@ -88,10 +235,7 @@
         </ScrollViewer>
 
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
-                       PrimaryButtonClick="OpenFileInSystemClick">
+                       PrimaryButtonClick="OpenFileInSystemClick"/>
 
-        </ContentDialog>
-        
-        
     </StackPanel>
 </Page>

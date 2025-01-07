@@ -52,6 +52,7 @@ namespace ElectronicCorrectionNotebook
             // StartAutoSaveTimer();
         }
 
+        #region 保存计时器
         private void StartAutoSaveTimer()
         {
             _dispatcherTimer = new DispatcherTimer();
@@ -82,7 +83,9 @@ namespace ElectronicCorrectionNotebook
             saveTimeTextBlock.Text = $"Auto save in about {displaytime} s";
         }
 
-        // 导航到页面 绑定数据到UI控件
+        #endregion
+
+        // 导航到页面 绑定数据到UI控件-已改
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -93,24 +96,36 @@ namespace ElectronicCorrectionNotebook
                 TitleTextBox.Text = ErrorItem.Title;
                 DatePicker.Date = ErrorItem.Date;
 
+                // 获取软件数据文件夹路径
+                StorageFolder localFolder = await StorageFolder.GetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook"));
+                StorageFolder rtfFolder = await localFolder.CreateFolderAsync("rtfFiles", CreationCollisionOption.OpenIfExists);
+                string rtfFileName = $"{ErrorItem.Id}.rtf";
+                StorageFile rtfFile = await rtfFolder.CreateFileAsync(rtfFileName, CreationCollisionOption.OpenIfExists);
+
                 // 加载富文本框的内容
-                if (!string.IsNullOrEmpty(ErrorItem.Description))
+                try
                 {
-                    using (var stream = new InMemoryRandomAccessStream())
+                    // 检查文件是否存在
+                    StorageFile file = await rtfFolder.GetFileAsync(rtfFileName);
+                    if (file != null)
                     {
-                        using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
+                        // 如果是已经存在的页面
+                        using (var stream = await file.OpenAsync(FileAccessMode.Read))
                         {
-                            writer.WriteString(ErrorItem.Description);
-                            await writer.StoreAsync();
+                            DescriptionRichEditBox.Document.LoadFromStream(Microsoft.UI.Text.TextSetOptions.FormatRtf, stream);
                         }
-                        stream.Seek(0);
-                        DescriptionRichEditBox.Document.LoadFromStream(Microsoft.UI.Text.TextSetOptions.FormatRtf, stream);
+                    }
+                    else
+                    {
+                        // 文件不存在，初始化一个空的 RTF 文档
+                        DescriptionRichEditBox.Document.SetText(Microsoft.UI.Text.TextSetOptions.FormatRtf, string.Empty);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // 初始化为一个空的 RTF 文档
-                    DescriptionRichEditBox.Document.SetText(Microsoft.UI.Text.TextSetOptions.FormatRtf, @"{\rtf1\ansi\ansicpg1252\uc1\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}}");
+                    // 处理异常，例如记录日志或显示错误消息
+                    Debug.WriteLine($"Error loading RTF file: {ex.Message}");
+                    DescriptionRichEditBox.Document.SetText(Microsoft.UI.Text.TextSetOptions.FormatRtf, string.Empty);
                 }
 
                 RatingChoose.Value = ErrorItem.Rating;
@@ -118,7 +133,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 选择文件按钮点击事件
+        // 选择文件按钮点击事件-不用改
         private async void OnSelectFileClick(object sender, RoutedEventArgs e)
         {
             try
@@ -162,7 +177,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 显示文件图标
+        // 显示文件图标-不用改
         private void DisplayFilesIcon()
         {
             FilePanel.Items.Clear();
@@ -262,7 +277,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 右键菜单 删除单个文件
+        // 右键菜单 删除单个文件-不用改
         private async void DeleteImage(string filePath)
         {
             try
@@ -290,7 +305,7 @@ namespace ElectronicCorrectionNotebook
 
                 // 重新显示文件图标
                 DisplayFilesIcon();
-                SaveCurrentContentAsync();
+                await SaveCurrentContentAsync();
             }
             catch (Exception ex)
             {
@@ -298,7 +313,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 右键菜单 复制单个文件
+        // 右键菜单 复制单个文件-不用改
         private async void CopyFile(string filePath)
         {
             try
@@ -319,7 +334,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 点击文件图标
+        // 点击文件图标-不用改
         private async void File_Tapped(object sender, TappedRoutedEventArgs e)
         {
             try
@@ -399,7 +414,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 关掉媒体播放对话框
+        // 关掉媒体播放对话框-不用改
         private void mediaDialog_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
         {
             if (dialogMediaPlayer != null)
@@ -416,7 +431,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 以默认方式打开
+        // 以默认方式打开-不用改
         private async void OpenFileInSystemClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             try
@@ -461,7 +476,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 点击保存页面
+        // 点击保存页面-不用改
         private async void OnSaveClick(object sender, RoutedEventArgs e)
         {
             try
@@ -486,7 +501,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 点击删除页面
+        // 点击删除页面-已改
         private async void DeleteClick(object sender, RoutedEventArgs e)
         {
             ContentDialog confirmDialog = new ContentDialog
@@ -504,7 +519,7 @@ namespace ElectronicCorrectionNotebook
             {
                 try
                 {
-                    // 删除本地文件
+                    // 删除本地Files里的对应文件
                     foreach (var filePath in ErrorItem.FilePaths)
                     {
                         if (File.Exists(filePath))
@@ -512,6 +527,17 @@ namespace ElectronicCorrectionNotebook
                             File.Delete(filePath);
                         }
                     }
+
+                    // 删除本地rtfFiles里的对应文件
+                    // 下面的不能用，不知道为啥
+                    // string rtfFilePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "rtfFiles", $"{ErrorItem.Id}.rtf");
+                    string rtfFilePath = Path.Combine(appDataPath, "rtfFiles", $"{ErrorItem.Id}.rtf");
+
+                    if (File.Exists(rtfFilePath))
+                    {
+                        File.Delete(rtfFilePath);
+                    }
+                    
 
                     var errorItems = await DataService.LoadDataAsync(cts.Token); // 取出总的errorItems List
                     var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id); // 在List中寻找和当前ErrorItem ID匹配的
@@ -543,14 +569,14 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 日期设置为今天
+        // 日期设置为今天-不用改
         private void SetDateToTodayClick(object sender, RoutedEventArgs e)
         {
             ErrorItem.Date = DateTime.Now;
             DatePicker.Date = ErrorItem.Date;
         }
 
-        // 保存当前内容
+        // 保存当前内容-已改
         public async Task SaveCurrentContentAsync()
         {
             // 保存到对象
@@ -560,20 +586,17 @@ namespace ElectronicCorrectionNotebook
 
             try
             {
-                // 保存 RichEditBox 的内容到 RTF 格式的字符串
-                string rtfText;
-                using (var stream = new InMemoryRandomAccessStream())
+                // 获取软件数据文件夹路径
+                StorageFolder localFolder = await StorageFolder.GetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook"));
+                StorageFolder rtfFolder = await localFolder.CreateFolderAsync("rtfFiles", CreationCollisionOption.OpenIfExists);
+                string rtfFileName = $"{ErrorItem.Id}.rtf";
+                StorageFile rtfFile = await rtfFolder.CreateFileAsync(rtfFileName, CreationCollisionOption.ReplaceExisting);
+
+                // 保存 RichEditBox 的内容到 RTF 文件
+                using (var stream = await rtfFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
                     DescriptionRichEditBox.Document.SaveToStream(Microsoft.UI.Text.TextGetOptions.FormatRtf, stream);
-                    using (var reader = new DataReader(stream.GetInputStreamAt(0)))
-                    {
-                        await reader.LoadAsync((uint)stream.Size);
-                        rtfText = reader.ReadString((uint)stream.Size);
-                    }
                 }
-
-                // 更新 ErrorItem 的 Description
-                ErrorItem.Description = rtfText;
 
                 var errorItems = await DataService.LoadDataAsync(cts.Token);
                 var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
@@ -581,7 +604,6 @@ namespace ElectronicCorrectionNotebook
                 {
                     existingItem.Title = ErrorItem.Title;
                     existingItem.Date = ErrorItem.Date;
-                    existingItem.Description = ErrorItem.Description;
                     existingItem.FilePaths = ErrorItem.FilePaths;
                     existingItem.Rating = ErrorItem.Rating;
                 }
@@ -613,7 +635,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 从剪切板上传玩意儿
+        // 从剪切板上传玩意儿-不用改
         private async void OpenFromClipboardClick(object sender, RoutedEventArgs e)
         {
             try
@@ -710,7 +732,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 显示错误消息
+        // 显示错误消息-不用改
         private async Task ShowErrorMessageAsync(string title, Exception ex)
         {
             var errorDialog = new ContentDialog()
@@ -723,7 +745,7 @@ namespace ElectronicCorrectionNotebook
             await errorDialog.ShowAsync();
         }
 
-        // 把剪切板的文件复制到Files文件夹（可操作任意文件）
+        // 把剪切板的文件复制到Files文件夹（可操作任意文件）-不用改
         private async Task SaveFileToFixedPathAsync(StorageFile sourceFile, string destinationPath)
         {
             
@@ -744,7 +766,7 @@ namespace ElectronicCorrectionNotebook
             */
         }
 
-        // 把剪切板的Bitmap复制到Files文件夹（仅限截图）
+        // 把剪切板的Bitmap复制到Files文件夹（仅限截图）-不用改
         private async Task SaveStreamToFileAsync(IRandomAccessStream stream, string filePath)
         {
             var folder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
@@ -767,7 +789,7 @@ namespace ElectronicCorrectionNotebook
             */
         }
 
-        // 创建txt文本文件
+        // 创建txt文本文件-不用改
         private async Task CreateTextFileWithFileNamesAsync(string filePath, string text_Content)
         {
             var folder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
@@ -775,5 +797,58 @@ namespace ElectronicCorrectionNotebook
 
             await FileIO.WriteTextAsync(file, text_Content);
         }
+
+
+        #region RichEditBox Settings
+
+        private void BoldButton_Click(object sender, RoutedEventArgs e)
+        {
+            DescriptionRichEditBox.Document.Selection.CharacterFormat.Bold = Microsoft.UI.Text.FormatEffect.Toggle;
+        }
+
+        private void ItalicButton_Click(object sender, RoutedEventArgs e)
+        {
+            DescriptionRichEditBox.Document.Selection.CharacterFormat.Italic = Microsoft.UI.Text.FormatEffect.Toggle;
+        }
+
+        private void UnderlineButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selection = DescriptionRichEditBox.Document.Selection;
+            if (selection.CharacterFormat.Underline == Microsoft.UI.Text.UnderlineType.None)
+            {
+                selection.CharacterFormat.Underline = Microsoft.UI.Text.UnderlineType.Single;
+            }
+            else
+            {
+                selection.CharacterFormat.Underline = Microsoft.UI.Text.UnderlineType.None;
+            }
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedColor = (Button)sender;
+            var rectangle = (Microsoft.UI.Xaml.Shapes.Rectangle)clickedColor.Content;
+            var color = ((Microsoft.UI.Xaml.Media.SolidColorBrush)rectangle.Fill).Color;
+
+            DescriptionRichEditBox.Document.Selection.CharacterFormat.ForegroundColor = color;
+
+            fontColorButton.Flyout.Hide();
+            DescriptionRichEditBox.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
+        }
+
+        private void HighlightButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedColor = (Button)sender;
+            var rectangle = (Microsoft.UI.Xaml.Shapes.Rectangle)clickedColor.Content;
+            var color = ((Microsoft.UI.Xaml.Media.SolidColorBrush)rectangle.Fill).Color;
+
+            DescriptionRichEditBox.Document.Selection.CharacterFormat.BackgroundColor = color;
+
+            fontColorButton.Flyout.Hide();
+            DescriptionRichEditBox.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
+        }
+
+
+        #endregion
     }
 }

@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using WinRT;
 using PInvoke;
 using ElectronicCorrectionNotebook.DataStructure;
+using System.IO;
 
 namespace ElectronicCorrectionNotebook
 {
@@ -35,7 +36,14 @@ namespace ElectronicCorrectionNotebook
 
         private const int MinWidth = 1250;  // 设置最小宽度
         private const int MinHeight = 1250; // 设置最小高度
-        
+
+        // Data文件夹
+        private static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
+        // json文本文件路径
+        private static readonly string JsonFilePath = Path.Combine(appDataPath, "errors.json");
+        // rtf富文本路径
+        private static readonly string rtfPath = Path.Combine(appDataPath, "rtf");
+
         private Microsoft.UI.Windowing.AppWindow appWindow;
 
         public MainWindow()
@@ -52,6 +60,7 @@ namespace ElectronicCorrectionNotebook
 
             appWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
+            // 加载数据
             _ = LoadDataAsync(cts.Token);
 
             ExtendsContentIntoTitleBar = true;
@@ -114,14 +123,16 @@ namespace ElectronicCorrectionNotebook
         #endregion
 
         
-        // 加载数据-从json中读取数据
+        // 加载数据-从json中读取数据-不用改
         private async Task LoadDataAsync(CancellationToken token)
         {
             try
             {
+                // List<ErrorItems> errorItems 获取数据
                 errorItems = await DataService.LoadDataAsync(token);
                 foreach (var item in errorItems)
                 {
+                    // 添加导航视图项 入口
                     AddNavigationViewItem(item);
                 }
             }
@@ -142,7 +153,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 存储数据-把数据存储到json
+        // 存储数据-把数据存储到json-调用DataServie-不用改
         private async Task SaveDataAsync(CancellationToken token)
         {
             try
@@ -166,7 +177,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 导航栏中添加新项
+        // 导航栏中添加新项-不用改
         private void AddNavigationViewItem(ErrorItem errorItem)
         {
             var newItem = new NavigationViewItem
@@ -178,14 +189,13 @@ namespace ElectronicCorrectionNotebook
             nvSample.MenuItems.Add(newItem);
         }
 
-        // 添加新错题-总步骤
+        // 添加新错题-总步骤-已改
         private async void Add_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var newErrorItem = new ErrorItem
             {
                 Title = "New Error",
                 Date = DateTime.Now,
-                Description = @"{\rtf1\ansi\ansicpg1252\uc1\deff0{\fonttbl{\f0\fnil\fcharset0 Arial;}}}", // 初始化为一个空的 RTF 文档
                 FilePaths = new List<string>(),
                 Rating = -1,
             };
@@ -194,7 +204,7 @@ namespace ElectronicCorrectionNotebook
             await SaveDataAsync(cts.Token);
         }
 
-        // 关于
+        // 关于-不用改
         private async void About_Tapped(object sender, TappedRoutedEventArgs e)
         {
             PublicEvents.PlaySystemSound();
@@ -248,7 +258,7 @@ namespace ElectronicCorrectionNotebook
             await about.ShowAsync();
         }
 
-        // 当title更改时，更新导航视图项的名字
+        // 当title更改时，更新导航视图项的名字-不用改
         public void UpdateNavigationViewItem(ErrorItem errorItem)
         {
             foreach (var menuItem in nvSample.MenuItems)
@@ -261,7 +271,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 导航视图选择更改时
+        // 导航视图选择更改时-不用改
         public async void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             // 自动保存
@@ -284,7 +294,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 窗口关闭时
+        // 窗口关闭时-不用改
         public async void MainWindow_Closed(object sender, WindowEventArgs args)
         {
             /*
@@ -315,13 +325,13 @@ namespace ElectronicCorrectionNotebook
             Application.Current.Exit();
         }
 
-        // 应用程序退出时
+        // 应用程序退出时-不用改
         private async void OnExiting(object sender, object e)
         {
             await SaveCurrentStateAsync();
         }
 
-        // 保存当前状态
+        // 保存当前状态-不用改
         private async Task SaveCurrentStateAsync()
         {
             if (contentFrame.Content is ErrorDetailPage currentPage)
@@ -332,7 +342,7 @@ namespace ElectronicCorrectionNotebook
             cts.Cancel(); // 
         }
 
-        // 删除项
+        // 删除项-不用改？
         public async void RemoveNavigationViewItem(ErrorItem errorItem)
         {
             var selectedItem = nvSample.SelectedItem;
