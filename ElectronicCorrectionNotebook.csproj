@@ -279,6 +279,7 @@
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<ApplicationIcon>Assets\im.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution

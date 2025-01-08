@@ -49,6 +49,7 @@ namespace ElectronicCorrectionNotebook
         {
             this.InitializeComponent();
             cts = new CancellationTokenSource();
+            DescriptionRichEditBox.PointerPressed += DescriptionRichEditBox_PointerPressed;
             // StartAutoSaveTimer();
         }
 
@@ -848,6 +849,10 @@ namespace ElectronicCorrectionNotebook
             DescriptionRichEditBox.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
         }
 
+        private void DescriptionRichEditBox_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            DescriptionRichEditBox.Document.Selection.SetRange(0, 0);
+        }
 
         #endregion
     }
