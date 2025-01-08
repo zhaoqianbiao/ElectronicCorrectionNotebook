@@ -24,21 +24,18 @@
   
 
 ## 🕶️Main Page 主页面
-![image](gitImage/page1.png)
+![image](gitImage/mainPage.png)
+![image](gitImage/description.png)
 
-## 📊Image Dialog 图片查看
-![image](gitImage/imageDialog1.png)
-
-## 📃Add Files 添加文件
-![image](gitImage/openFile1.png)
-
-## 🔤Auto Spell Check 拼写检查
-### 得益于WinUI3的API，可以实现自动英文拼写检查
-![image](gitImage/correction1.png)
+## 📊Files 文件预览
+![image](gitImage/imageDialog.png)
+![image](gitImage/videoDialog.png)
 
 ## ⚙️Settings 设置
 ### 可实现笔记备份保存
-![image](gitImage/settingExport1.png)
+![image](gitImage/settingPage.png)
 
 ## 🥰About 关于
-![image](gitImage/about1.png)
+![image](gitImage/about.png)
+
+
