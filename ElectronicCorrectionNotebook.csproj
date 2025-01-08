@@ -13,6 +13,7 @@
     <LangVersion>11.0</LangVersion>
 	  <!--如果要调试，需要删除下面这行-->
 	<WindowsPackageType>None</WindowsPackageType>
+	<SelfContained>true</SelfContained>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	
   </PropertyGroup>
@@ -280,6 +281,9 @@
 		<ApplicationIcon>Assets\im.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Authors>QianbiaoZhao</Authors>
+		<Company>QianbiaoZhao</Company>
+		<Product>QianbiaoZhao</Product>
 	</PropertyGroup>
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
