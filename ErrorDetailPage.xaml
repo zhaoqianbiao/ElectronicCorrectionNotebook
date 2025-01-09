@@ -14,7 +14,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3.5*"/>
-                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="1.8*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -36,13 +36,19 @@
 
             <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" Margin="25,0,0,0">
                 <Grid>
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Glyph="&#xE8EC;" Margin="0,5,0,0"/>
-                        <TextBlock Text="Tag 标签" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.1*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Glyph="&#xE8EC;" Margin="0,5,0,0" Grid.Column="0" HorizontalAlignment="Left"/>
+                        <TextBlock Text="Tag 标签" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"  Grid.Column="1" 
+                                HorizontalAlignment="Left"/>
                     </StackPanel>
+                    <Button Content="Add" Margin="5,0,0,0" Grid.Column="2" HorizontalAlignment="Right"/>
                 </Grid>
                 <TextBox x:Name="TagBox" TextChanged="TagBox_TextChanged" 
-                            FontSize="15" Margin="0,9,0,10"/>
+                            FontSize="15" Margin="0,5,0,10"/>
             </StackPanel>
 
             <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,-2,0,0">
