@@ -95,6 +95,7 @@ namespace ElectronicCorrectionNotebook
             {
                 // 绑定数据到UI控件
                 TitleTextBox.Text = ErrorItem.Title;
+                TagBox.Text = ErrorItem.CorrectionTag;
                 DatePicker.Date = ErrorItem.Date;
 
                 // 获取软件数据文件夹路径
@@ -582,6 +583,7 @@ namespace ElectronicCorrectionNotebook
         {
             // 保存到对象
             ErrorItem.Title = TitleTextBox.Text;
+            ErrorItem.CorrectionTag = TagBox.Text;
             ErrorItem.Date = DatePicker.Date.DateTime;
             ErrorItem.Rating = RatingChoose.Value;
 
@@ -622,17 +624,6 @@ namespace ElectronicCorrectionNotebook
             {
                 // 处理其他异常，例如记录日志或显示错误消息
                 await ShowErrorMessageAsync("Error saving data", ex);
-            }
-        }
-
-        // 标题文本框内容改变时 更新对象 更新列表项目名称
-        private void TitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ErrorItem != null)
-            {
-                ErrorItem.Title = TitleTextBox.Text;
-                var mainWindow = (MainWindow)App.MainWindow;
-                mainWindow.UpdateNavigationViewItem(ErrorItem);
             }
         }
 
@@ -799,6 +790,27 @@ namespace ElectronicCorrectionNotebook
             await FileIO.WriteTextAsync(file, text_Content);
         }
 
+        // tag文本框内容改变时 更新对象 更新列表项目名称
+        private void TagBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ErrorItem != null)
+            {
+                ErrorItem.CorrectionTag = TagBox.Text;
+                var mainWindow = (MainWindow)App.MainWindow;
+                mainWindow.UpdateNavigationViewItem(ErrorItem);
+            }
+        }
+
+        // title文本框内容改变时 更新对象 更新列表项目名称
+        private void TitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ErrorItem != null)
+            {
+                ErrorItem.Title = TitleTextBox.Text;
+                var mainWindow = (MainWindow)App.MainWindow;
+                mainWindow.UpdateNavigationViewItem(ErrorItem);
+            }
+        }
 
         #region RichEditBox Settings
 

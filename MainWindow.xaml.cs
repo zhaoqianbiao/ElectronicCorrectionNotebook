@@ -37,13 +37,6 @@ namespace ElectronicCorrectionNotebook
         private const int MinWidth = 1250;  // 设置最小宽度
         private const int MinHeight = 1250; // 设置最小高度
 
-        // Data文件夹
-        private static readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
-        // json文本文件路径
-        private static readonly string JsonFilePath = Path.Combine(appDataPath, "errors.json");
-        // rtf富文本路径
-        private static readonly string rtfPath = Path.Combine(appDataPath, "rtf");
-
         private Microsoft.UI.Windowing.AppWindow appWindow;
 
         public MainWindow()
@@ -67,62 +60,6 @@ namespace ElectronicCorrectionNotebook
             SetTitleBar(AppTitleBar);
         }
 
-        #region MinMaxCodeRegion
-        private delegate IntPtr WinProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
-        private WinProc newWndProc = null;
-        private IntPtr oldWndProc = IntPtr.Zero;
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, User32.WindowLongIndexFlags nIndex, WinProc newProc);
-        [DllImport("user32.dll")]
-        private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
-
-        private void SubClassing()
-        {
-            // Get the Window's HWND
-            var hwnd = this.As<IWindowNative>().WindowHandle;
-
-            newWndProc = new WinProc(NewWindowProc);
-            oldWndProc = SetWindowLongPtr(hwnd, User32.WindowLongIndexFlags.GWL_WNDPROC, newWndProc);
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct MINMAXINFO
-        {
-            public POINT ptReserved;
-            public POINT ptMaxSize;
-            public POINT ptMaxPosition;
-            public POINT ptMinTrackSize;
-            public POINT ptMaxTrackSize;
-        }
-
-        private IntPtr NewWindowProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam)
-        {
-            switch (Msg)
-            {
-                case User32.WindowMessage.WM_GETMINMAXINFO:
-                    var dpi = User32.GetDpiForWindow(hWnd);
-                    // float scalingFactor = (float)dpi / 96;
-
-                    MINMAXINFO minMaxInfo = Marshal.PtrToStructure<MINMAXINFO>(lParam);
-                    minMaxInfo.ptMinTrackSize.x = (int)(MinWidth);
-                    minMaxInfo.ptMinTrackSize.y = (int)(MinHeight);
-                    Marshal.StructureToPtr(minMaxInfo, lParam, true);
-                    break;
-            }
-            return CallWindowProc(oldWndProc, hWnd, Msg, wParam, lParam);
-        }
-
-        [ComImport]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
-        internal interface IWindowNative
-        {
-            IntPtr WindowHandle { get; }
-        }
-
-        #endregion
-
-        
         // 加载数据-从json中读取数据-不用改
         private async Task LoadDataAsync(CancellationToken token)
         {
@@ -180,12 +117,46 @@ namespace ElectronicCorrectionNotebook
         // 导航栏中添加新项-不用改
         private void AddNavigationViewItem(ErrorItem errorItem)
         {
+            // 创建Grid布局
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            // 标题
+            var titleTextBlock = new TextBlock
+            {
+                Text = errorItem.Title,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(titleTextBlock, 0);
+
+            // 用于显示胶囊的框框
+            var tagBorder = new Border
+            {
+                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                CornerRadius = new CornerRadius(11),
+                Padding = new Thickness(8, 2, 8, 2),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Child = new TextBlock
+                {
+                    Text = errorItem.CorrectionTag
+                }
+            };
+            Grid.SetColumn(tagBorder, 1);
+
+            // 将标题和胶囊添加到Grid中
+            grid.Children.Add(titleTextBlock);
+            grid.Children.Add(tagBorder);
+
+            // item，把总的stackPanel放进去
             var newItem = new NavigationViewItem
             {
-                Content = errorItem.Title,
+                Content = grid,
                 Icon = new SymbolIcon(Symbol.Comment),
                 Tag = errorItem
             };
+
             nvSample.MenuItems.Add(newItem);
         }
 
@@ -258,16 +229,49 @@ namespace ElectronicCorrectionNotebook
             await about.ShowAsync();
         }
 
-        // 当title更改时，更新导航视图项的名字-不用改
+        // 当title和tag更改时，更新导航视图项的名字-不用改
         public void UpdateNavigationViewItem(ErrorItem errorItem)
         {
             foreach (var menuItem in nvSample.MenuItems)
             {
                 if (menuItem is NavigationViewItem item && item.Tag == errorItem)
                 {
-                    item.Content = errorItem.Title;
+                    // 创建Grid布局
+                    var grid = new Grid();
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    // 标题
+                    var titleTextBlock = new TextBlock
+                    {
+                        Text = errorItem.Title,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    Grid.SetColumn(titleTextBlock, 0);
+
+                    // 用于显示胶囊的框框
+                    var tagBorder = new Border
+                    {
+                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                        CornerRadius = new CornerRadius(11),
+                        Padding = new Thickness(8, 2, 8, 2),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Child = new TextBlock
+                        {
+                            Text = errorItem.CorrectionTag
+                        }
+                    };
+                    Grid.SetColumn(tagBorder, 1);
+
+                    // 将标题和胶囊添加到Grid中
+                    grid.Children.Add(titleTextBlock);
+                    grid.Children.Add(tagBorder);
+
+                    item.Content = grid;
                     break;
                 }
+
             }
         }
 
@@ -342,7 +346,7 @@ namespace ElectronicCorrectionNotebook
             cts.Cancel(); // 
         }
 
-        // 删除项-不用改？
+        // 删除项-不用改
         public async void RemoveNavigationViewItem(ErrorItem errorItem)
         {
             var selectedItem = nvSample.SelectedItem;
@@ -351,5 +355,131 @@ namespace ElectronicCorrectionNotebook
             await SaveDataAsync(cts.Token);
             contentFrame.Content = null;
         }
+
+        // 跳转的时候 自动选中对应的item
+        private void SelectNavigationViewItem(ErrorItem errorItem)
+        {
+            foreach (var menuItem in nvSample.MenuItems)
+            {
+                if (menuItem is NavigationViewItem item && item.Tag == errorItem)
+                {
+                    nvSample.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        #region AutoSuggestBoxCodeRegion
+
+        // 在搜索框中输入的时候更改建议列表
+        public void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                var suggestions = new List<string>();
+                foreach (var item in errorItems)
+                {
+                    if (item.Title.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
+                    {
+                        suggestions.Add(item.Title);
+                    }
+                }
+                sender.ItemsSource = suggestions;
+            }
+        }
+
+        // 点击某一项后，跳转到某一个页面
+        public void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                foreach (var item in errorItems)
+                {
+                    if (item.Title == args.ChosenSuggestion)
+                    {
+                        contentFrame.Navigate(typeof(ErrorDetailPage), item);
+                        SelectNavigationViewItem(item);
+                        break;
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(args.QueryText))
+            {
+                foreach (var item in errorItems)
+                {
+                    if (item.Title == args.QueryText)
+                    {
+                        contentFrame.Navigate(typeof(ErrorDetailPage), item);
+                        SelectNavigationViewItem(item);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 确认点击某一项后，搜索栏中显示那一项的名称
+        public void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            sender.Text = args.SelectedItem.ToString();
+        }
+
+        #endregion
+
+        #region MinMaxCodeRegion
+        private delegate IntPtr WinProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
+        private WinProc newWndProc = null;
+        private IntPtr oldWndProc = IntPtr.Zero;
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, User32.WindowLongIndexFlags nIndex, WinProc newProc);
+        [DllImport("user32.dll")]
+        private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
+
+        private void SubClassing()
+        {
+            // Get the Window's HWND
+            var hwnd = this.As<IWindowNative>().WindowHandle;
+
+            newWndProc = new WinProc(NewWindowProc);
+            oldWndProc = SetWindowLongPtr(hwnd, User32.WindowLongIndexFlags.GWL_WNDPROC, newWndProc);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        private IntPtr NewWindowProc(IntPtr hWnd, User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam)
+        {
+            switch (Msg)
+            {
+                case User32.WindowMessage.WM_GETMINMAXINFO:
+                    var dpi = User32.GetDpiForWindow(hWnd);
+                    // float scalingFactor = (float)dpi / 96;
+
+                    MINMAXINFO minMaxInfo = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+                    minMaxInfo.ptMinTrackSize.x = (int)(MinWidth);
+                    minMaxInfo.ptMinTrackSize.y = (int)(MinHeight);
+                    Marshal.StructureToPtr(minMaxInfo, lParam, true);
+                    break;
+            }
+            return CallWindowProc(oldWndProc, hWnd, Msg, wParam, lParam);
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
+        internal interface IWindowNative
+        {
+            IntPtr WindowHandle { get; }
+        }
+
+        #endregion
+
+        
     }
 }

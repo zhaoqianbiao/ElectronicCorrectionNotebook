@@ -26,14 +26,13 @@
 
                 <!--图标&标题-->
                 <ColumnDefinition x:Name="ComboColumn" Width="Auto"/>
-                
+
                 <!--右侧拖动区-->
                 <ColumnDefinition x:Name="RightDragColumn" Width="*"/>
-                
+
                 <!--最右侧三大金刚-->
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
             </Grid.ColumnDefinitions>
-
             <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
                 <Image x:Name="TitleBarIcon" 
                     Source="ms-appx:///Assets/im.ico"
@@ -44,11 +43,8 @@
                     FontSize="13"
                     VerticalAlignment="Center"
                     Margin="10,0,0,0">
-                </TextBlock>        
+                </TextBlock>
             </StackPanel>
-                
-
-
         </Grid>
 
         <!-- NavigationView -->
@@ -66,8 +62,16 @@
                         IsTabStop="False"
                         Margin="0,0,0,0"
                         Grid.Row="1">
+
+            <NavigationView.AutoSuggestBox>
+                <AutoSuggestBox PlaceholderText="Search Correction" QueryIcon="Find" AutomationProperties.Name="Search" 
+                                TextChanged="AutoSuggestBox_TextChanged" 
+                                QuerySubmitted="AutoSuggestBox_QuerySubmitted" 
+                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"/>
+            </NavigationView.AutoSuggestBox>
+
             <NavigationView.MenuItems>
-                <NavigationViewItemHeader Content="Your errors"/>
+                <NavigationViewItemHeader Content="Your Correction"/>
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>

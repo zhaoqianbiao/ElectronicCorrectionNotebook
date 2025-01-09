@@ -13,7 +13,8 @@
     <StackPanel Margin="30,23,30,0" x:Name="rootPanel">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3.5*"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
@@ -24,16 +25,27 @@
                         <TextBlock Text="Title 标题" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
                     </StackPanel>
                     <RatingControl IsClearEnabled="True"
-                                x:Name="RatingChoose"
-                                IsReadOnly="False" Caption="Importance"
-                                HorizontalAlignment="Right"
-                                Margin="0,0,10,0"/>
+                                    x:Name="RatingChoose"
+                                    IsReadOnly="False" Caption="Importance"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,0,10,0"/>
                 </Grid>
                 <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged" 
                         FontSize="15" Margin="0,5,0,10"/>
             </StackPanel>
 
-            <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="1" Margin="25,-2,0,0">
+            <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" Margin="25,0,0,0">
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Glyph="&#xE8EC;" Margin="0,5,0,0"/>
+                        <TextBlock Text="Tag 标签" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+                <TextBox x:Name="TagBox" TextChanged="TagBox_TextChanged" 
+                            FontSize="15" Margin="0,9,0,10"/>
+            </StackPanel>
+
+            <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,-2,0,0">
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Delete" Label="Delete" Click="DeleteClick" Foreground="Red"
                                     BorderBrush="Red" BorderThickness="1">
@@ -48,6 +60,9 @@
                 <TextBlock x:Name="saveTimeTextBlock" Text="time" HorizontalAlignment="Center"/>
             </StackPanel>
         </Grid>
+        
+        
+        
 
         <StackPanel Orientation="Horizontal">
             <FontIcon Glyph="&#xE787;" />
@@ -219,7 +234,7 @@
 
         <StackPanel Orientation="Horizontal">
             <FontIcon Glyph="&#xE9F9;" />
-            <TextBlock Text="Documents 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
+            <TextBlock Text="Files 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
             <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
         </StackPanel>
