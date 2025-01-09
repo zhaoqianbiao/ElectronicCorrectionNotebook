@@ -167,6 +167,7 @@ namespace ElectronicCorrectionNotebook
             {
                 Title = "New Error",
                 Date = DateTime.Now,
+                CorrectionTag = "Empty Tag",
                 FilePaths = new List<string>(),
                 Rating = -1,
             };
@@ -389,7 +390,7 @@ namespace ElectronicCorrectionNotebook
         }
 
         // 点击某一项后，跳转到某一个页面
-        public void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        public async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             if (args.ChosenSuggestion != null)
             {
@@ -397,8 +398,9 @@ namespace ElectronicCorrectionNotebook
                 {
                     if (item.Title == args.ChosenSuggestion)
                     {
-                        contentFrame.Navigate(typeof(ErrorDetailPage), item);
-                        SelectNavigationViewItem(item);
+                        // 为什么要把下面这行注释掉才能好呢，为什么导航两次会导致数据丢失？
+                        // contentFrame.Navigate(typeof(ErrorDetailPage), item);
+                        SelectNavigationViewItem(item); // 自动选中对应的item
                         break;
                     }
                 }
@@ -409,8 +411,8 @@ namespace ElectronicCorrectionNotebook
                 {
                     if (item.Title == args.QueryText)
                     {
-                        contentFrame.Navigate(typeof(ErrorDetailPage), item);
-                        SelectNavigationViewItem(item);
+                        // contentFrame.Navigate(typeof(ErrorDetailPage), item);
+                        SelectNavigationViewItem(item); // 自动选中对应的item
                         break;
                     }
                 }

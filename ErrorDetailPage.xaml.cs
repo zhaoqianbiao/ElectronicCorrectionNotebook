@@ -552,6 +552,7 @@ namespace ElectronicCorrectionNotebook
                     var mainWindow = (MainWindow)App.MainWindow;
                     mainWindow.RemoveNavigationViewItem(ErrorItem); // 给navigationView传递要删除的当前的ErrorItem
 
+                    /*
                     ContentDialog deleteSuccess = new ContentDialog()
                     {
                         XamlRoot = rootPanel.XamlRoot,
@@ -562,6 +563,7 @@ namespace ElectronicCorrectionNotebook
                     };
                     PublicEvents.PlaySystemSound();
                     await deleteSuccess.ShowAsync();
+                    */
                 }
                 catch (Exception ex)
                 {
