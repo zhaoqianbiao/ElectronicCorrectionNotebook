@@ -14,6 +14,12 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="rootPanel">
+        <Grid.Resources>
+            <ItemsPanelTemplate x:Key="WrapPanelTemplate">
+                <ItemsWrapGrid Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>

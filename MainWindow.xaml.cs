@@ -130,26 +130,38 @@ namespace ElectronicCorrectionNotebook
             };
             Grid.SetColumn(titleTextBlock, 0);
 
-            // 用于显示胶囊的框框
-            var tagBorder = new Border
+            // 用于显示多个标签的ItemsControl
+            var itemsControl = new ItemsControl
             {
-                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
-                CornerRadius = new CornerRadius(11),
-                Padding = new Thickness(8, 2, 8, 2),
+                ItemsPanel = (ItemsPanelTemplate)this.rootPanel.Resources["WrapPanelTemplate"],
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Child = new TextBlock
-                {
-                    Text = errorItem.CorrectionTag
-                }
+                HorizontalAlignment = HorizontalAlignment.Right
             };
-            Grid.SetColumn(tagBorder, 1);
 
-            // 将标题和胶囊添加到Grid中
+            // 添加每个标签到ItemsControl
+            foreach (var tag in errorItem.CorrectionTag)
+            {
+                var tagBorder = new Border
+                {
+                    Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                    CornerRadius = new CornerRadius(11),
+                    Padding = new Thickness(4, 2, 4, 2),
+                    Margin = new Thickness(2),
+                    Child = new TextBlock
+                    {
+                        Text = tag,
+                        Foreground = new SolidColorBrush(Colors.White)
+                    }
+                };
+                itemsControl.Items.Add(tagBorder);
+            }
+            Grid.SetColumn(itemsControl, 1);
+
+            // 将标题和ItemsControl添加到Grid中
             grid.Children.Add(titleTextBlock);
-            grid.Children.Add(tagBorder);
+            grid.Children.Add(itemsControl);
 
-            // item，把总的stackPanel放进去
+            // 创建NavigationViewItem并将Grid作为其内容
             var newItem = new NavigationViewItem
             {
                 Content = grid,
@@ -249,24 +261,36 @@ namespace ElectronicCorrectionNotebook
                     };
                     Grid.SetColumn(titleTextBlock, 0);
 
-                    // 用于显示胶囊的框框
-                    var tagBorder = new Border
+                    // 用于显示多个标签的ItemsControl
+                    var itemsControl = new ItemsControl
                     {
-                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
-                        CornerRadius = new CornerRadius(11),
-                        Padding = new Thickness(8, 2, 8, 2),
+                        ItemsPanel = (ItemsPanelTemplate)this.rootPanel.Resources["WrapPanelTemplate"],
                         VerticalAlignment = VerticalAlignment.Center,
-                        HorizontalAlignment = HorizontalAlignment.Right,
-                        Child = new TextBlock
-                        {
-                            Text = errorItem.CorrectionTag
-                        }
+                        HorizontalAlignment = HorizontalAlignment.Right
                     };
-                    Grid.SetColumn(tagBorder, 1);
 
-                    // 将标题和胶囊添加到Grid中
+                    // 添加每个标签到ItemsControl
+                    foreach (var tag in errorItem.CorrectionTag)
+                    {
+                        var tagBorder = new Border
+                        {
+                            Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                            CornerRadius = new CornerRadius(11),
+                            Padding = new Thickness(4, 2, 4, 2),
+                            Margin = new Thickness(2),
+                            Child = new TextBlock
+                            {
+                                Text = tag,
+                                Foreground = new SolidColorBrush(Colors.White)
+                            }
+                        };
+                        itemsControl.Items.Add(tagBorder);
+                    }
+                    Grid.SetColumn(itemsControl, 1);
+
+                    // 将标题和ItemsControl添加到Grid中
                     grid.Children.Add(titleTextBlock);
-                    grid.Children.Add(tagBorder);
+                    grid.Children.Add(itemsControl);
 
                     item.Content = grid;
                     break;
