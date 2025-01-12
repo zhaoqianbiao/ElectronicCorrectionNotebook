@@ -133,7 +133,7 @@ namespace ElectronicCorrectionNotebook
             // 用于显示胶囊的框框
             var tagBorder = new Border
             {
-                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 234, 234, 234)),
                 CornerRadius = new CornerRadius(11),
                 Padding = new Thickness(8, 2, 8, 2),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -253,7 +253,7 @@ namespace ElectronicCorrectionNotebook
                     // 用于显示胶囊的框框
                     var tagBorder = new Border
                     {
-                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 45, 45, 45)),
+                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 234, 234, 234)),
                         CornerRadius = new CornerRadius(11),
                         Padding = new Thickness(8, 2, 8, 2),
                         VerticalAlignment = VerticalAlignment.Center,
@@ -390,7 +390,7 @@ namespace ElectronicCorrectionNotebook
         }
 
         // 点击某一项后，跳转到某一个页面
-        public async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        public void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             if (args.ChosenSuggestion != null)
             {

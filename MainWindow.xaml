@@ -33,6 +33,9 @@
                 <!--最右侧三大金刚-->
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
             </Grid.ColumnDefinitions>
+
+            <Image Source="ms-appx:///Assets/githubBaby.gif" HorizontalAlignment="Left" 
+                   VerticalAlignment="Center" Width="30" Height="auto" Margin="10,0,0,0"/>
             <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
                 <Image x:Name="TitleBarIcon" 
                     Source="ms-appx:///Assets/im.ico"
@@ -88,6 +91,7 @@
                     </NavigationViewItem>
                 </StackPanel>
             </NavigationView.PaneFooter>
+            
 
             <Frame x:Name="contentFrame" />
         </NavigationView>

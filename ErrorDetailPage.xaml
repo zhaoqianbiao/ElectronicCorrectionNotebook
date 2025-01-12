@@ -67,9 +67,6 @@
             </StackPanel>
         </Grid>
         
-        
-        
-
         <StackPanel Orientation="Horizontal">
             <FontIcon Glyph="&#xE787;" />
             <TextBlock Text="Date 日期" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
@@ -243,6 +240,7 @@
             <TextBlock Text="Files 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
             <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
+            <Button Content="Refresh 刷新文件栏" Click="RefreshButton_Click" Margin="0,0,10,0"/>
         </StackPanel>
         
         <ScrollViewer Height="270" Margin="0, 10, 0, 10">
