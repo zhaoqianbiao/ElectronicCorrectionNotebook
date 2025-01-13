@@ -1,15 +1,15 @@
 # ElectronicCorrectionNotebook Windows端电子错题本
-## A windows Electronic Correction Notebook, used to record your mistakes in exams and homework 
-## Windows端电子错题本📘📘📘
+### A windows Electronic Correction Notebook, used to record your mistakes in exams and homework 
+### Windows端电子错题本📘📘📘
 
-## 关于我：高三再读，等待申请的时候没事干，写了这个小软件，希望可以辅助大家偷偷内卷
-## About me：Grade 12 in international high school in CHINA, waiting for offers of universities....
+### 关于我：高三再读，等待申请的时候没事干，写了这个小软件，希望可以辅助大家偷偷内卷
+### About me：Grade 12 in international high school in CHINA, waiting for offers of universities....
 
 <img src="gitImage/tang.gif" width="200px">
 
-## 技术栈：WinUI3 + C# + XAML
+### 技术栈：WinUI3 + C# + XAML
 
-## 未来计划 持续更新中...🚩   
+### 未来计划 持续更新中...🚩   
 
 1. 🔥新增文件夹功能，实现文件夹管理  
 2. 🔥新增粘贴链接🔗功能   
