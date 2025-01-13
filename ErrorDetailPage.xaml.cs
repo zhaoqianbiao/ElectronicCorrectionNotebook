@@ -825,7 +825,7 @@ namespace ElectronicCorrectionNotebook
         }
 
         // 强制刷新
-        private void ForceDisplayFilesIcon()
+        /*private void ForceDisplayFilesIcon()
         {
             FilePanel.Items.Clear();
             foreach (var filePath in ErrorItem.FilePaths)
@@ -926,6 +926,7 @@ namespace ElectronicCorrectionNotebook
                 FilePanel.Items.Add(contentPanel);
             }
         }
+        */
 
         // 刷新按钮点击事件
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
