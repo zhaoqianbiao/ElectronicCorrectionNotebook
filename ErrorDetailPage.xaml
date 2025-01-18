@@ -7,10 +7,27 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    x:Name="rootPage"
-    >
+    x:Name="rootPage">
 
     <StackPanel Margin="30,23,30,0" x:Name="rootPanel">
+
+        <StackPanel.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource FontBold}"/>
+            </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+                <Setter Property="CornerRadius" Value="{StaticResource Corner8}"/>
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+                <Setter Property="CornerRadius" Value="{StaticResource Corner8}"/>
+            </Style>
+
+        </StackPanel.Resources>
+        
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3.5*"/>
@@ -20,18 +37,18 @@
 
             <StackPanel x:Name="leftZone" Orientation="Vertical" Grid.Column="0">
                 <Grid>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <FontIcon Glyph="&#xE70F;" />
-                        <TextBlock Text="Title 标题" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+                        <TextBlock Text="Title 标题" FontSize="21" Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <RatingControl IsClearEnabled="True"
-                                    x:Name="RatingChoose"
-                                    IsReadOnly="False" Caption="Importance"
-                                    HorizontalAlignment="Right"
-                                    Margin="0,0,10,0"/>
+                    <RatingControl IsClearEnabled="True" x:Name="RatingChoose"
+                            IsReadOnly="False" Caption="Importance"
+                            HorizontalAlignment="Right" Margin="0,5,10,0"
+                            VerticalAlignment="Center">
+                    </RatingControl>
                 </Grid>
                 <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged" 
-                        FontSize="15" Margin="0,5,0,10"/>
+                        FontSize="15" Margin="0,0,0,10"/>
             </StackPanel>
 
             <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" Margin="25,0,0,0">
@@ -40,10 +57,10 @@
                         <ColumnDefinition Width="0.1*"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="10,0,0,0">
                         <FontIcon Glyph="&#xE8EC;" Margin="0,5,0,0" Grid.Column="0" HorizontalAlignment="Left"/>
-                        <TextBlock Text="Tag 标签" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"  Grid.Column="1" 
-                                HorizontalAlignment="Left"/>
+                        <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0"  Grid.Column="1" 
+                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </StackPanel>
                     <Button Content="Add" Margin="5,0,0,0" Grid.Column="2" HorizontalAlignment="Right"/>
                 </Grid>
@@ -51,29 +68,28 @@
                             FontSize="15" Margin="0,5,0,10"/>
             </StackPanel>
 
-            <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,-2,0,0">
+            <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Delete" Label="Delete" Click="DeleteClick" Foreground="Red"
-                                    BorderBrush="Red" BorderThickness="1">
+                                    BorderBrush="Red" BorderThickness="1" FontFamily="{StaticResource FontRegular}">
                     </AppBarButton>
                     <AppBarButton Icon="Save" Label="Save" Click="OnSaveClick" Foreground="Green"
-                                    BorderBrush="Green" BorderThickness="1">
+                                    BorderBrush="Green" BorderThickness="1" FontFamily="{StaticResource FontRegular}">
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control" Key="S"/>
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
                 </StackPanel>
-                <TextBlock x:Name="saveTimeTextBlock" Text="time" HorizontalAlignment="Center"/>
             </StackPanel>
         </Grid>
-        
-        <StackPanel Orientation="Horizontal">
+
+        <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
             <FontIcon Glyph="&#xE787;" />
-            <TextBlock Text="Date 日期" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+            <TextBlock Text="Date 日期" FontSize="21"  Margin="10,0,0,0" VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
-            <DatePicker x:Name="DatePicker" FontSize="15" />
+            <CalendarDatePicker x:Name="DatePicker"  PlaceholderText="Pick a date" CornerRadius="8"/>
             <Button Content="Today 今天" Click="SetDateToTodayClick" Margin="5,0,0,0"/>
         </StackPanel>
 
@@ -83,9 +99,10 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal" Margin="10,0,0,0">
                 <FontIcon Glyph="&#xE736;"/>
-                <TextBlock Text="Description 详细描述" FontSize="21" FontWeight="Bold" Margin="10,0,0,0"/>
+                <TextBlock Text="Description 详细描述" FontSize="21" Margin="10,0,0,0"
+                           VerticalAlignment="Center"/>
             </StackPanel>
             
             <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
@@ -120,16 +137,56 @@
                             <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
                                 <VariableSizedWrapGrid.Resources>
                                     <Style TargetType="Rectangle">
-                                        <Setter Property="Width" Value="32"/>
-                                        <Setter Property="Height" Value="32"/>
+                                        <Setter Property="Width" Value="30"/>
+                                        <Setter Property="Height" Value="30"/>
                                     </Style>
                                     <Style TargetType="Button">
                                         <Setter Property="Padding" Value="0"/>
                                         <Setter Property="MinWidth" Value="0"/>
                                         <Setter Property="MinHeight" Value="0"/>
-                                        <Setter Property="Margin" Value="6"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="CornerRadius" Value="20"/>
+                                        <Setter Property="BorderBrush" Value="Black"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <VisualStateManager.VisualStateGroups>
+                                                            <VisualStateGroup x:Name="CommonStates">
+                                                                <VisualState x:Name="Normal"/>
+                                                                <VisualState x:Name="PointerOver">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                                <VisualState x:Name="Pressed">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                                <VisualState x:Name="Disabled">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                            </VisualStateGroup>
+                                                        </VisualStateManager.VisualStateGroups>
+                                                        <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </VariableSizedWrapGrid.Resources>
+                                
                                 <Button Click="HighlightButton_Click" AutomationProperties.Name="Transparent">
                                     <Button.Content>
                                         <Rectangle Fill="Transparent"/>
@@ -148,6 +205,11 @@
                                 <Button Click="HighlightButton_Click" AutomationProperties.Name="Yellow">
                                     <Button.Content>
                                         <Rectangle Fill="Yellow"/>
+                                    </Button.Content>
+                                </Button>
+                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Pink">
+                                    <Button.Content>
+                                        <Rectangle Fill="Pink"/>
                                     </Button.Content>
                                 </Button>
                                 <Button Click="HighlightButton_Click" AutomationProperties.Name="Green">
@@ -176,7 +238,46 @@
                                         <Setter Property="Padding" Value="0"/>
                                         <Setter Property="MinWidth" Value="0"/>
                                         <Setter Property="MinHeight" Value="0"/>
-                                        <Setter Property="Margin" Value="6"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="CornerRadius" Value="20"/>
+                                        <Setter Property="BorderBrush" Value="Black"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <VisualStateManager.VisualStateGroups>
+                                                            <VisualStateGroup x:Name="CommonStates">
+                                                                <VisualState x:Name="Normal"/>
+                                                                <VisualState x:Name="PointerOver">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                                <VisualState x:Name="Pressed">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                                <VisualState x:Name="Disabled">
+                                                                    <Storyboard>
+                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                                        </ObjectAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </VisualState>
+                                                            </VisualStateGroup>
+                                                        </VisualStateManager.VisualStateGroups>
+                                                        <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </VariableSizedWrapGrid.Resources>
                                 <Button Click="ColorButton_Click" AutomationProperties.Name="White">
@@ -204,6 +305,11 @@
                                         <Rectangle Fill="Yellow"/>
                                     </Button.Content>
                                 </Button>
+                                <Button Click="ColorButton_Click" AutomationProperties.Name="Violet">
+                                    <Button.Content>
+                                        <Rectangle Fill="Violet"/>
+                                    </Button.Content>
+                                </Button>
                                 <Button Click="ColorButton_Click" AutomationProperties.Name="Green">
                                     <Button.Content>
                                         <Rectangle Fill="Green"/>
@@ -212,11 +318,6 @@
                                 <Button Click="ColorButton_Click" AutomationProperties.Name="Indigo">
                                     <Button.Content>
                                         <Rectangle Fill="Indigo"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Violet">
-                                    <Button.Content>
-                                        <Rectangle Fill="Violet"/>
                                     </Button.Content>
                                 </Button>
                                 <Button Click="ColorButton_Click" AutomationProperties.Name="Gray">
@@ -233,11 +334,11 @@
         </Grid>
 
         <RichEditBox x:Name="DescriptionRichEditBox"
-                     FontSize="15" Margin="0,5,0,15" AcceptsReturn="True" Height="240" TextWrapping="Wrap"/>
+                     FontSize="15" Margin="0,5,0,15" AcceptsReturn="True" Height="240" TextWrapping="Wrap" FontFamily="{StaticResource FontRegular}"/>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
             <FontIcon Glyph="&#xE9F9;" />
-            <TextBlock Text="Files 文件" FontSize="21" FontWeight="Bold" Margin="10,2,15,0"/>
+            <TextBlock Text="Files 文件" FontSize="21" Margin="10,0,15,0" VerticalAlignment="Center"/>
             <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
             <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
             <Button Content="Refresh 刷新文件栏" Click="RefreshButton_Click" Margin="0,0,10,0"/>
@@ -254,7 +355,7 @@
         </ScrollViewer>
 
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
-                       PrimaryButtonClick="OpenFileInSystemClick"/>
+                       PrimaryButtonClick="OpenFileInSystemClick" FontFamily="{StaticResource FontRegular}"/>
 
     </StackPanel>
 </Page>

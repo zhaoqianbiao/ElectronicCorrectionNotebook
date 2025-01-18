@@ -13,14 +13,12 @@ using Windows.System;
 using System.IO;
 using System.Threading;
 using Windows.ApplicationModel.DataTransfer;
-using static System.Net.Mime.MediaTypeNames;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
-using WinRT.Interop;
-using Windows.Media.Playback;
 using Windows.Media.Core;
 using System.Diagnostics;
 using ElectronicCorrectionNotebook.DataStructure;
+using Microsoft.UI.Xaml.Media;
 
 namespace ElectronicCorrectionNotebook
 {
@@ -39,50 +37,12 @@ namespace ElectronicCorrectionNotebook
         // MediaPlayerElement类级别字段
         private MediaPlayerElement dialogMediaPlayer;
 
-        // 计时器保存
-        private DispatcherTimer _dispatcherTimer;
-        private DateTime _lastSaveTime;
-        private TimeSpan _saveInterval = TimeSpan.FromMinutes(1);
-
         // 初始化页面
         public ErrorDetailPage()
         {
             this.InitializeComponent();
             cts = new CancellationTokenSource();
         }
-
-        #region 保存计时器
-        private void StartAutoSaveTimer()
-        {
-            _dispatcherTimer = new DispatcherTimer();
-            _dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-            _dispatcherTimer.Tick += DispatcherTimer_Tick;
-            _dispatcherTimer.Start();
-            _lastSaveTime = DateTime.Now;
-            UpdateAutoSaveText();
-        }
-
-        private async void DispatcherTimer_Tick(object sender, object e)
-        {
-            var timeSinceLastSave = DateTime.Now - _lastSaveTime;
-            if (timeSinceLastSave >= _saveInterval)
-            {
-                // 执行保存操作
-                await SaveCurrentContentAsync();
-                _lastSaveTime = DateTime.Now;
-            }
-            UpdateAutoSaveText();
-        }
-
-        private void UpdateAutoSaveText()
-        {
-            var timeSinceLastSave = DateTime.Now - _lastSaveTime;
-            var timeUntilNextSave = _saveInterval - timeSinceLastSave;
-            var displaytime = ((int)timeUntilNextSave.TotalSeconds / 10) * 10;
-            saveTimeTextBlock.Text = $"Auto save in about {displaytime} s";
-        }
-
-        #endregion
 
         // 导航到页面 绑定数据到UI控件
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -261,7 +221,8 @@ namespace ElectronicCorrectionNotebook
                         XamlRoot = this.Content.XamlRoot,
                         Title = "Error 错误",
                         Content = "No images found 剪贴板中没有图像。",
-                        CloseButtonText = "Ok 确定"
+                        CloseButtonText = "Ok 确定",
+                        FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
                     };
                     await dialog.ShowAsync();
                 }
@@ -345,12 +306,12 @@ namespace ElectronicCorrectionNotebook
                 var contextMenu = new MenuFlyout();
 
                 // 菜单1 复制文件
-                var copyItem = new MenuFlyoutItem { Text = "Copy 复制" };
+                var copyItem = new MenuFlyoutItem { Text = "Copy 复制6", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
                 copyItem.Click += (sender, e) => CopyFile(filePath);
                 contextMenu.Items.Add(copyItem);
 
                 // 菜单2 删除
-                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除" };
+                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除6", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
                 deleteItem.Click += (sender, e) => DeleteImage(filePath);
                 contextMenu.Items.Add(deleteItem);
 
@@ -363,7 +324,10 @@ namespace ElectronicCorrectionNotebook
                     Width = 120,
                     TextWrapping = TextWrapping.Wrap,
                     TextAlignment = TextAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center 
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    FontSize = 12,
+                    Margin = new Thickness(0,5,0,0),
+                    FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                 };
                 var contentPanel = new StackPanel
                 {
@@ -453,22 +417,6 @@ namespace ElectronicCorrectionNotebook
                             Tag = filePath
                         };
 
-                        /* 有bug, 自动跳转到不知道为什么
-                        var scrollView = new ScrollView
-                        {
-                            Content = dialogImage,
-                            ZoomMode = ScrollingZoomMode.Enabled,
-                            // ContentOrientation = ScrollingContentOrientation.None,
-                            // VerticalAlignment = VerticalAlignment.Top,
-                            // HorizontalAlignment = HorizontalAlignment.Left,
-                            HorizontalScrollMode = ScrollingScrollMode.Auto,
-                            HorizontalScrollBarVisibility = ScrollingScrollBarVisibility.Auto,
-                            VerticalScrollMode = ScrollingScrollMode.Auto,
-                            VerticalScrollBarVisibility = ScrollingScrollBarVisibility.Visible,
-                            MinZoomFactor = 1.0
-                        };
-                        */
-
                         Dialog.Content = dialogImage;
                         await Dialog.ShowAsync();
                     }
@@ -484,6 +432,7 @@ namespace ElectronicCorrectionNotebook
                             TextWrapping = TextWrapping.Wrap,
                             Margin = new Thickness(10),
                             IsTextSelectionEnabled = true,
+                            FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
                         };
 
                         var textBlockScrollViewer = new ScrollViewer
@@ -578,7 +527,6 @@ namespace ElectronicCorrectionNotebook
             }
             finally
             {
-                // !!!!!!!!!!!重要！！
                 dialogImage = null;
                 dialogTextBlock = null;
                 dialogMediaPlayer = null;
@@ -599,6 +547,7 @@ namespace ElectronicCorrectionNotebook
                     Content = "Save successfully 保存成功！",
                     CloseButtonText = "Ok",
                     DefaultButton = ContentDialogButton.Close,
+                    FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
                 };
                 PublicEvents.PlaySystemSound();
                 await saveSuccess.ShowAsync();
@@ -620,7 +569,8 @@ namespace ElectronicCorrectionNotebook
                 PrimaryButtonText = "Yes 是",
                 CloseButtonText = "No 否",
                 DefaultButton = ContentDialogButton.Close,
-                XamlRoot = this.Content.XamlRoot
+                XamlRoot = this.Content.XamlRoot,
+                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
             };
             PublicEvents.PlaySystemSound();
             var result = await confirmDialog.ShowAsync();
@@ -659,18 +609,7 @@ namespace ElectronicCorrectionNotebook
                     var mainWindow = (MainWindow)App.MainWindow;
                     mainWindow.RemoveNavigationViewItem(ErrorItem); // 给navigationView传递要删除的当前的ErrorItem
 
-                    /*
-                    ContentDialog deleteSuccess = new ContentDialog()
-                    {
-                        XamlRoot = rootPanel.XamlRoot,
-                        Title = "Deleted 已删除",
-                        Content = "Delete successfully 删除成功！",
-                        CloseButtonText = "Ok",
-                        DefaultButton = ContentDialogButton.Close,
-                    };
-                    PublicEvents.PlaySystemSound();
-                    await deleteSuccess.ShowAsync();
-                    */
+                    
                 }
                 catch (Exception ex)
                 {
@@ -693,7 +632,7 @@ namespace ElectronicCorrectionNotebook
             // 保存到对象
             ErrorItem.Title = TitleTextBox.Text;
             ErrorItem.CorrectionTag = TagBox.Text;
-            ErrorItem.Date = DatePicker.Date.DateTime;
+            ErrorItem.Date = DatePicker.Date;
             ErrorItem.Rating = RatingChoose.Value;
 
             try
@@ -744,7 +683,8 @@ namespace ElectronicCorrectionNotebook
                 XamlRoot = this.Content.XamlRoot,
                 Title = title,
                 Content = ex.Message,
-                CloseButtonText = "Ok 确定"
+                CloseButtonText = "Ok 确定",
+                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
             };
             await errorDialog.ShowAsync();
         }
@@ -757,17 +697,6 @@ namespace ElectronicCorrectionNotebook
             var destinationFile = await destinationFolder.CreateFileAsync(Path.GetFileName(destinationPath), CreationCollisionOption.ReplaceExisting);
             await sourceFile.CopyAndReplaceAsync(destinationFile);
             
-
-            /*
-            var dialog = new ContentDialog
-            {
-                XamlRoot = this.Content.XamlRoot,
-                Title = "Success 成功",
-                Content = $"Saved to 文件已保存到 {destinationFile.Path}",
-                CloseButtonText = "Ok 确定"
-            };
-            await dialog.ShowAsync();
-            */
         }
 
         // 把剪切板的Bitmap复制到Files文件夹（仅限截图）
@@ -780,17 +709,6 @@ namespace ElectronicCorrectionNotebook
             {
                 await RandomAccessStream.CopyAndCloseAsync(stream.GetInputStreamAt(0), fileStream.GetOutputStreamAt(0));
             }
-
-            /*
-            var dialog = new ContentDialog
-            {
-                XamlRoot = this.Content.XamlRoot,
-                Title = "Success 成功",
-                Content = $"Saved to 图像已保存到 {file.Path}",
-                CloseButtonText = "Ok 确定"
-            };
-            await dialog.ShowAsync();
-            */
         }
 
         // 创建txt文本文件
@@ -823,110 +741,6 @@ namespace ElectronicCorrectionNotebook
                 mainWindow.UpdateNavigationViewItem(ErrorItem);
             }
         }
-
-        // 强制刷新
-        /*private void ForceDisplayFilesIcon()
-        {
-            FilePanel.Items.Clear();
-            foreach (var filePath in ErrorItem.FilePaths)
-            {
-                var fileName = Path.GetFileName(filePath);
-                var fileType = Path.GetExtension(filePath).ToLower();
-                var bitmapImage = new BitmapImage();
-
-                switch (fileType)
-                {
-                    case ".docx":
-                    case ".doc":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/word.png"));
-                        break;
-                    case ".pptx":
-                    case ".ppt":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/powerpoint.png"));
-                        break;
-                    case ".xlsx":
-                    case ".xls":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/excel.png"));
-                        break;
-                    case ".pdf":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/pdf.png"));
-                        break;
-                    case ".txt":
-                    case ".md":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/text.png"));
-                        break;
-                    case ".zip":
-                    case ".rar":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/zip.png"));
-                        break;
-                    case ".xmind":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/xmind.png"));
-                        break;
-                    case ".mp3":
-                    case ".mp4":
-                    case ".mkv":
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/video.png"));
-                        break;
-                    case ".jpg":
-                    case ".jpeg":
-                    case ".png":
-                    case ".bmp":
-                    case ".gif":
-                    case ".ico":
-                        // 清空图片缓存并重新加载图片
-                        bitmapImage = new BitmapImage();
-                        bitmapImage.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                        bitmapImage.UriSource = new Uri(filePath);
-                        break;
-                    default:
-                        bitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/unknown.png"));
-                        break;
-                }
-
-                var image = new Microsoft.UI.Xaml.Controls.Image
-                {
-                    Source = bitmapImage,
-                    Width = 100,
-                    Height = 100,
-                    Tag = filePath, // 将文件路径存储在Tag中，即使是文件图标，也会传递着文件的路径
-                };
-                image.Tapped += File_Tapped;
-
-                // 创建右键菜单
-                var contextMenu = new MenuFlyout();
-
-                // 菜单1 复制文件
-                var copyItem = new MenuFlyoutItem { Text = "Copy 复制" };
-                copyItem.Click += (sender, e) => CopyFile(filePath);
-                contextMenu.Items.Add(copyItem);
-
-                // 菜单2 删除
-                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除" };
-                deleteItem.Click += (sender, e) => DeleteImage(filePath);
-                contextMenu.Items.Add(deleteItem);
-
-                // 设置右键菜单
-                image.ContextFlyout = contextMenu;
-
-                var fileNameBlock = new TextBlock
-                {
-                    Text = fileName,
-                    Width = 120,
-                    TextWrapping = TextWrapping.Wrap,
-                    TextAlignment = TextAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-                var contentPanel = new StackPanel
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                };
-                contentPanel.Children.Add(image);
-                contentPanel.Children.Add(fileNameBlock);
-                contentPanel.Margin = new Thickness(5);
-                FilePanel.Items.Add(contentPanel);
-            }
-        }
-        */
 
         // 刷新按钮点击事件
         private void RefreshButton_Click(object sender, RoutedEventArgs e)

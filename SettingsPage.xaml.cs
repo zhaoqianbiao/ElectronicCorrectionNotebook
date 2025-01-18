@@ -1,13 +1,11 @@
 using ElectronicCorrectionNotebook.DataStructure;
 using ElectronicCorrectionNotebook.Services;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 

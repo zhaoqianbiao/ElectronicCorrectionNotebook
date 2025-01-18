@@ -4,16 +4,31 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ElectronicCorrectionNotebook"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     RequestedTheme="Light">
     <Application.Resources>
+
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+            
             <SolidColorBrush x:Key="WindowCaptionBackground">Transparent</SolidColorBrush>
             <SolidColorBrush x:Key="WindowCaptionForeground">Black</SolidColorBrush>
+
+            <!--大煞笔划为为什么把regular的familyName写写成HarmonyOS Sans SC，和其他不一样！！！！-->
+            <FontFamily x:Key="FontRegular">ms-appx:///Assets/HarmonyOS_Sans_SC_Regular.ttf#HarmonyOS Sans SC</FontFamily>
+            <FontFamily x:Key="FontBold">ms-appx:///Assets/HarmonyOS_Sans_SC_Bold.ttf#HarmonyOS Sans SC Bold</FontFamily>
+            <FontFamily x:Key="FontLight">ms-appx:///Assets/HarmonyOS_Sans_SC_Light.ttf#HarmonyOS Sans SC Light</FontFamily>
+            <FontFamily x:Key="FontThin">ms-appx:///Assets/HarmonyOS_Sans_SC_Thin.ttf#HarmonyOS Sans SC Thin</FontFamily>
+            <FontFamily x:Key="FontMedium">ms-appx:///Assets/HarmonyOS_Sans_SC_Medium.ttf#HarmonyOS Sans SC Medium</FontFamily>
+            <FontFamily x:Key="FontBlack">ms-appx:///Assets/HarmonyOS_Sans_SC_Black.ttf#HarmonyOS Sans SC Black</FontFamily>
+
+            <CornerRadius x:Key="Corner8">8</CornerRadius>
+
+
         </ResourceDictionary>
+
     </Application.Resources>
 </Application>

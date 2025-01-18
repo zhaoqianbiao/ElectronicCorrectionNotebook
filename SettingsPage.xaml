@@ -6,30 +6,45 @@
     xmlns:local="using:ElectronicCorrectionNotebook"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
     x:Name="rootPage"
     >
 
-    <StackPanel Padding="20" x:Name="rootPanel">
-        <TextBlock Text="Settings 设置" FontSize="25"/>
 
-        <TextBlock Text="Export data to back up" Margin="0, 20, 0, 0"/>
+    <StackPanel x:Name="rootPanel" Margin="30,23,30,0">
+        <StackPanel.Resources>
+            <Style TargetType="controls:SettingsCard">
+                <Setter Property="Margin" Value="0,0,0,8"/>
+                <Setter Property="CornerRadius" Value="{StaticResource Corner8}"/>
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+                <Setter Property="CornerRadius" Value="{StaticResource Corner8}"/>
+            </Style>
+            <Style TargetType="ToggleSwitch">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+            </Style>
+        </StackPanel.Resources>
+        
+        <TextBlock Text="Settings 设置" FontSize="25" Margin="0,0,0,40"/>
 
-        <Button Content="Export data 导出错题数据" Click="ExportDataButton_Click" Margin="0, 10, 0, 0"/>
+        <controls:SettingsCard Header="Export data to back up 导出错题数据备份" 
+                               Description="If you need to backup the data, you can export it.">
+            <Button Content="Export 导出" Click="ExportDataButton_Click"/>
+        </controls:SettingsCard>
 
-        <!--ComboBox Header="Themes" PlaceholderText="Pick a Theme" Margin="0, 20, 0, 0"  Width="200" 
-                  x:Name="themeMode" SelectionChanged="ThemeMode_SelectionChanged">
-            <x:String>Light</x:String>
-            <x:String>Dark</x:String>
-        </ComboBox-->
+        <controls:SettingsCard Header="Theme 主题">
+            <ToggleSwitch AutomationProperties.Name="simpleToggleSwitch" Toggled="ToggleSwitch_Toggled"/>
+        </controls:SettingsCard>
 
-        <ToggleSwitch AutomationProperties.Name="simpleToggleSwitch" Toggled="ToggleSwitch_Toggled"/>
-
-        <TextBlock Text="All changes will be saved when the program is closed, but you can also save manually." Margin="0, 20, 0, 0"/>
-        <TextBlock Text="程序关闭时会保存所有更改，但您也可随时手动保存" />
-
-        <TextBlock Text="每隔1分钟自动保存" Margin="0,20,0,0"/>
-
-        <TextBlock Text="若上传或粘贴时文件重复，会自动创建新副本；如果需要更新，请先删除旧文件" Margin="0,20,0,0"/>
+        <controls:SettingsCard Header="Auto Save 自动保存"
+                               Description="All changes will be saved when the program is closed, but you can also save manually.&#x0a;程序关闭时会保存所有更改，但您也可随时手动保存">
+        </controls:SettingsCard>
     </StackPanel>
 </Page>

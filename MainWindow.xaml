@@ -9,17 +9,22 @@
     mc:Ignorable="d"
     >
 
-    <Window.SystemBackdrop>
-        <MicaBackdrop/>
-    </Window.SystemBackdrop>
-
     <Grid x:Name="rootPanel">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+            </Style>
+            <Style TargetType="NavigationViewItem">
+                <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
+            </Style>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="AppTitleBar" Height="40">
+        <Grid x:Name="AppTitleBar" Height="40" Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <!--左侧拖动区-->
                 <ColumnDefinition x:Name="LeftDragColumn" Width="*"/>
@@ -50,50 +55,53 @@
             </StackPanel>
         </Grid>
 
-        <!-- NavigationView -->
         <NavigationView x:Name="nvSample"
-                        IsSettingsVisible="True"
-                        IsBackButtonVisible="Collapsed"
-                        IsBackEnabled="False"
-                        SelectionChanged="NavigationView_SelectionChanged"
-                        AlwaysShowHeader="True"
-                        PaneTitle="Electronic Correction Notebook"
-                        PaneDisplayMode="Auto"
-                        ExpandedModeThresholdWidth="1150"
-                        CompactModeThresholdWidth="870"
-                        SelectionFollowsFocus="Disabled"
-                        IsTabStop="False"
-                        Margin="0,0,0,0"
-                        Grid.Row="1">
+            IsSettingsVisible="True"
+            IsBackButtonVisible="Collapsed"
+            IsBackEnabled="False"
+            SelectionChanged="NavigationView_SelectionChanged"
+            AlwaysShowHeader="True"
+            PaneTitle="Electronic Correction Notebook"
+            FontFamily="{StaticResource FontRegular}"
+            PaneDisplayMode="Auto"
+            ExpandedModeThresholdWidth="1150"
+            CompactModeThresholdWidth="870"
+            SelectionFollowsFocus="Disabled"
+            IsTabStop="False"
+            Margin="0,0,0,0"
+            OpenPaneLength="330"
+            Grid.Row="1">
 
             <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox PlaceholderText="Search Correction" QueryIcon="Find" AutomationProperties.Name="Search" 
-                                TextChanged="AutoSuggestBox_TextChanged" 
-                                QuerySubmitted="AutoSuggestBox_QuerySubmitted" 
-                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"/>
+                    TextChanged="AutoSuggestBox_TextChanged" 
+                    QuerySubmitted="AutoSuggestBox_QuerySubmitted" 
+                    SuggestionChosen="AutoSuggestBox_SuggestionChosen"
+                    FontFamily="{StaticResource FontRegular}"
+                    CornerRadius="{StaticResource Corner8}"/>
             </NavigationView.AutoSuggestBox>
 
             <NavigationView.MenuItems>
-                <NavigationViewItemHeader Content="Your Correction"/>
+                <NavigationViewItemHeader Content="Your Correction" FontFamily="{StaticResource FontBold}"/>
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
                 <StackPanel x:Name="Operations" Orientation="Vertical" Visibility="Visible">
-                    <NavigationViewItem Content="Add" Tapped="Add_Tapped">
+                    <NavigationViewItem Content="Add" Tapped="Add_Tapped" FontFamily="{StaticResource FontRegular}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE82E;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="About" Tapped="About_Tapped">
+                    <NavigationViewItem Content="About" Tapped="About_Tapped" FontFamily="{StaticResource FontRegular}">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE946;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
                 </StackPanel>
             </NavigationView.PaneFooter>
-            
 
-            <Frame x:Name="contentFrame" />
+            <Frame x:Name="contentFrame"/>
         </NavigationView>
+
     </Grid>
 </Window>

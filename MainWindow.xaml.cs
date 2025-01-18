@@ -10,21 +10,12 @@ using System.Threading;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.Core;
-using Windows.ApplicationModel;
 using Microsoft.UI;           // Needed for WindowId.
-using Microsoft.UI.Windowing; // Needed for AppWindow.
-using WinRT.Interop;          // Needed for XAML/HWND interop.
-using Microsoft.UI.Input;
-using Rect = Windows.Foundation.Rect;
-using Windows.Foundation;
-using Windows.Graphics;
-using Windows.UI.ViewManagement;
-using Windows.UI.WindowManagement;
 using System.Runtime.InteropServices;
 using WinRT;
 using PInvoke;
 using ElectronicCorrectionNotebook.DataStructure;
-using System.IO;
+using Microsoft.UI.Text;
 
 namespace ElectronicCorrectionNotebook
 {
@@ -42,6 +33,15 @@ namespace ElectronicCorrectionNotebook
         public MainWindow()
         {
             InitializeComponent();
+
+            var micaBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+            micaBackdrop.Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.BaseAlt;
+
+            // var acry = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+            
+
+            this.SystemBackdrop = micaBackdrop;
+
             SubClassing();
             Closed += MainWindow_Closed;
             CoreApplication.Exiting += OnExiting;
@@ -126,21 +126,24 @@ namespace ElectronicCorrectionNotebook
             var titleTextBlock = new TextBlock
             {
                 Text = errorItem.Title,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
             };
             Grid.SetColumn(titleTextBlock, 0);
 
             // 用于显示胶囊的框框
             var tagBorder = new Border
             {
-                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 234, 234, 234)),
-                CornerRadius = new CornerRadius(11),
-                Padding = new Thickness(8, 2, 8, 2),
+                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 255, 194, 37)),
+                CornerRadius = new CornerRadius(5),
+                Padding = new Thickness(5, 1, 5, 1),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Child = new TextBlock
                 {
-                    Text = errorItem.CorrectionTag
+                    Text = errorItem.CorrectionTag,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = 13,
+                    FontFamily = (FontFamily)Application.Current.Resources["FontBold"]
                 }
             };
             Grid.SetColumn(tagBorder, 1);
@@ -154,7 +157,7 @@ namespace ElectronicCorrectionNotebook
             {
                 Content = grid,
                 Icon = new SymbolIcon(Symbol.Comment),
-                Tag = errorItem
+                Tag = errorItem,
             };
 
             nvSample.MenuItems.Add(newItem);
@@ -208,6 +211,7 @@ namespace ElectronicCorrectionNotebook
 
             aboutInfo.Inlines.Add(hyperlink);
             aboutInfo.Inlines.Add(new Run { Text = " in GCGS", Foreground = color });
+            aboutInfo.FontFamily = (FontFamily)Application.Current.Resources["FontRegular"];
 
             Image aboutImage = new Image()
             {
@@ -224,6 +228,7 @@ namespace ElectronicCorrectionNotebook
             {
                 XamlRoot = this.Content.XamlRoot,
                 Title = "About",
+                FontFamily = (FontFamily)Application.Current.Resources["FontBold"],
                 Content = contentPanel,
                 CloseButtonText = "Ok"
             };
@@ -253,14 +258,17 @@ namespace ElectronicCorrectionNotebook
                     // 用于显示胶囊的框框
                     var tagBorder = new Border
                     {
-                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 234, 234, 234)),
-                        CornerRadius = new CornerRadius(11),
-                        Padding = new Thickness(8, 2, 8, 2),
+                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 255, 194, 37)),
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(5, 1, 5, 1),
                         VerticalAlignment = VerticalAlignment.Center,
                         HorizontalAlignment = HorizontalAlignment.Right,
                         Child = new TextBlock
                         {
-                            Text = errorItem.CorrectionTag
+                            Text = errorItem.CorrectionTag,
+                            FontSize = 13,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            FontFamily = (FontFamily)Application.Current.Resources["FontBold"]
                         }
                     };
                     Grid.SetColumn(tagBorder, 1);
@@ -386,6 +394,7 @@ namespace ElectronicCorrectionNotebook
                     }
                 }
                 sender.ItemsSource = suggestions;
+                sender.FontFamily = (FontFamily)Application.Current.Resources["FontRegular"];
             }
         }
 
