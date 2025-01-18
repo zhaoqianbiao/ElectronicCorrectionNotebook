@@ -306,12 +306,12 @@ namespace ElectronicCorrectionNotebook
                 var contextMenu = new MenuFlyout();
 
                 // ²Ëµ¥1 ¸´ÖÆÎÄ¼þ
-                var copyItem = new MenuFlyoutItem { Text = "Copy ¸´ÖÆ6", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
+                var copyItem = new MenuFlyoutItem { Text = "Copy ¸´ÖÆ", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
                 copyItem.Click += (sender, e) => CopyFile(filePath);
                 contextMenu.Items.Add(copyItem);
 
                 // ²Ëµ¥2 É¾³ý
-                var deleteItem = new MenuFlyoutItem { Text = "Delete É¾³ý6", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
+                var deleteItem = new MenuFlyoutItem { Text = "Delete É¾³ý", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
                 deleteItem.Click += (sender, e) => DeleteImage(filePath);
                 contextMenu.Items.Add(deleteItem);
 
