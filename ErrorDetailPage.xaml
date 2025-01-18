@@ -37,6 +37,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            
             <StackPanel x:Name="leftZone" Orientation="Vertical" Grid.Column="0">
                 <Grid>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
@@ -366,12 +367,5 @@
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
                        PrimaryButtonClick="OpenFileInSystemClick" FontFamily="{StaticResource FontRegular}"/>
 
-        <controls:TabbedCommandBar>
-            <controls:TabbedCommandBar.MenuItems>
-                <controls:TabbedCommandBarItem Header="Home">
-                    
-                </controls:TabbedCommandBarItem>
-            </controls:TabbedCommandBar.MenuItems>
-        </controls:TabbedCommandBar>
     </StackPanel>
 </Page>

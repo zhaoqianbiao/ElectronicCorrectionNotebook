@@ -156,7 +156,8 @@ namespace ElectronicCorrectionNotebook
             await errorDialog.ShowAsync();
         }
 
-        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        // 主题切换
+        private void ThemeToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
             ToggleSwitch themeToggleSwitch = sender as ToggleSwitch;
             if (themeToggleSwitch.IsOn)
@@ -172,6 +173,20 @@ namespace ElectronicCorrectionNotebook
                 {
                     rootElement.RequestedTheme = ElementTheme.Light;
                 }
+            }
+        }
+
+        // 音效开关
+        private void SoundToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch soundToggleSwitch = sender as ToggleSwitch;
+            if (soundToggleSwitch.IsOn)
+            {
+                ElementSoundPlayer.State = ElementSoundPlayerState.On;
+            }
+            else
+            {
+                ElementSoundPlayer.State = ElementSoundPlayerState.Off;
             }
         }
     }

@@ -34,17 +34,33 @@
         
         <TextBlock Text="Settings 设置" FontSize="25" Margin="0,0,0,40"/>
 
-        <controls:SettingsCard Header="Export data to back up 导出错题数据备份" 
-                               Description="If you need to backup the data, you can export it.">
+        <controls:SettingsCard Header="Export data to back up 导出错题数据备份" Description="If you need to backup the data, you can export it.">
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xEDE1;" />
+            </controls:SettingsCard.HeaderIcon>
             <Button Content="Export 导出" Click="ExportDataButton_Click"/>
         </controls:SettingsCard>
 
         <controls:SettingsCard Header="Theme 主题">
-            <ToggleSwitch AutomationProperties.Name="simpleToggleSwitch" Toggled="ToggleSwitch_Toggled"/>
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE790;" />
+            </controls:SettingsCard.HeaderIcon>
+            <ToggleSwitch AutomationProperties.Name="simpleToggleSwitch" Toggled="ThemeToggleSwitch_Toggled"/>
         </controls:SettingsCard>
 
-        <controls:SettingsCard Header="Auto Save 自动保存"
-                               Description="All changes will be saved when the program is closed, but you can also save manually.&#x0a;程序关闭时会保存所有更改，但您也可随时手动保存">
+        <controls:SettingsCard Header="Auto Save 自动保存" Description="All changes will be saved when the program is closed, but you can also save manually.&#x0a;程序关闭时会保存所有更改，但您也可随时手动保存">
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE74E;" />
+            </controls:SettingsCard.HeaderIcon>
         </controls:SettingsCard>
+
+        <controls:SettingsCard Header="Sound 操作音效" Description="操作声音">
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xEC4F;" />
+            </controls:SettingsCard.HeaderIcon>
+            <ToggleSwitch Toggled="SoundToggleSwitch_Toggled"/>
+        </controls:SettingsCard>
+
+        
     </StackPanel>
 </Page>
