@@ -6,6 +6,8 @@
     xmlns:local="using:ElectronicCorrectionNotebook"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
     x:Name="rootPage">
 
@@ -62,7 +64,9 @@
                         <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0"  Grid.Column="1" 
                                 HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <Button Content="Add" Margin="5,0,0,0" Grid.Column="2" HorizontalAlignment="Right"/>
+                    <Button Margin="8,0,0,0" Grid.Column="2" HorizontalAlignment="Right" Height="32">
+                        <FontIcon Glyph="&#xE710;"/>
+                    </Button>
                 </Grid>
                 <TextBox x:Name="TagBox" TextChanged="TagBox_TextChanged" 
                             FontSize="15" Margin="0,5,0,10"/>
@@ -333,8 +337,13 @@
             
         </Grid>
 
+
         <RichEditBox x:Name="DescriptionRichEditBox"
-                     FontSize="15" Margin="0,5,0,15" AcceptsReturn="True" Height="240" TextWrapping="Wrap" FontFamily="{StaticResource FontRegular}"/>
+                FontSize="15" Margin="0,5,0,0" AcceptsReturn="True" Height="240" TextWrapping="Wrap" 
+                FontFamily="{StaticResource FontRegular}" CornerRadius="8"/>
+        <controls:PropertySizer Binding="{x:Bind DescriptionRichEditBox.Height, Mode=TwoWay}" VerticalAlignment="Top"
+                                Orientation="Horizontal" Margin="0,0,0,10" CornerRadius="5" Height="12" Minimum="100"/>
+
 
         <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
             <FontIcon Glyph="&#xE9F9;" />
@@ -357,5 +366,12 @@
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
                        PrimaryButtonClick="OpenFileInSystemClick" FontFamily="{StaticResource FontRegular}"/>
 
+        <controls:TabbedCommandBar>
+            <controls:TabbedCommandBar.MenuItems>
+                <controls:TabbedCommandBarItem Header="Home">
+                    
+                </controls:TabbedCommandBarItem>
+            </controls:TabbedCommandBar.MenuItems>
+        </controls:TabbedCommandBar>
     </StackPanel>
 </Page>

@@ -6,6 +6,8 @@
     xmlns:local="using:ElectronicCorrectionNotebook"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
     >
 
@@ -64,12 +66,12 @@
             PaneTitle="Electronic Correction Notebook"
             FontFamily="{StaticResource FontRegular}"
             PaneDisplayMode="Auto"
-            ExpandedModeThresholdWidth="1150"
+            ExpandedModeThresholdWidth="1140"
             CompactModeThresholdWidth="870"
             SelectionFollowsFocus="Disabled"
             IsTabStop="False"
             Margin="0,0,0,0"
-            OpenPaneLength="330"
+            OpenPaneLength="300"
             Grid.Row="1">
 
             <NavigationView.AutoSuggestBox>
@@ -100,7 +102,11 @@
                 </StackPanel>
             </NavigationView.PaneFooter>
 
-            <Frame x:Name="contentFrame"/>
+            <Grid>
+                <controls:PropertySizer HorizontalAlignment="Left" Binding="{x:Bind nvSample.OpenPaneLength, Mode=TwoWay}"
+                                        Width="12" Orientation="Vertical" Minimum="300"/>
+                <Frame x:Name="contentFrame"/>
+            </Grid>
         </NavigationView>
 
     </Grid>
