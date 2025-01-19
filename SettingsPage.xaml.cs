@@ -142,6 +142,7 @@ namespace ElectronicCorrectionNotebook
                     Content = "Success 错题数据已成功导出!",
                     CloseButtonText = "Ok",
                     // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
                 };
                 await successDialog.ShowAsync();
                 PublicEvents.PlaySystemSound();
@@ -173,6 +174,7 @@ namespace ElectronicCorrectionNotebook
                 CloseButtonText = "Ok 确定",
                 XamlRoot = this.XamlRoot, // 确保使用当前页面的 XamlRoot
                 // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await errorDialog.ShowAsync();
         }

@@ -58,6 +58,7 @@ namespace ElectronicCorrectionNotebook
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
+
         }
 
         // 加载数据-从json中读取数据-不用改
@@ -168,6 +169,7 @@ namespace ElectronicCorrectionNotebook
         // 关于-不用改
         private async void About_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            
             PublicEvents.PlaySystemSound();
             StackPanel contentPanel = new StackPanel();
 
@@ -176,17 +178,6 @@ namespace ElectronicCorrectionNotebook
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 10, 0, 0)
             };
-
-
-            /*SolidColorBrush color = null;
-            if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
-            {
-                color = new SolidColorBrush(Colors.White);
-            }
-            else
-            {
-                color = new SolidColorBrush(Colors.Black);
-            }*/
 
             aboutInfo.Inlines.Add(new Run { Text = "Created by " });
 
@@ -218,8 +209,10 @@ namespace ElectronicCorrectionNotebook
                 Content = contentPanel,
                 CloseButtonText = "Ok",
                 // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await about.ShowAsync();
+            
         }
 
         // 当title和tag更改时，更新导航视图项的名字-不用改
@@ -353,6 +346,7 @@ namespace ElectronicCorrectionNotebook
                 CloseButtonText = "Ok 确定",
                 FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                 // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await errorDialog.ShowAsync();
         }
@@ -384,7 +378,7 @@ namespace ElectronicCorrectionNotebook
             {
                 foreach (var item in errorItems)
                 {
-                    if (item.Title == args.ChosenSuggestion)
+                    if (item.Title == (string)args.ChosenSuggestion)
                     {
                         SelectNavigationViewItem(item); // 自动选中对应的item
                         break;
@@ -467,6 +461,6 @@ namespace ElectronicCorrectionNotebook
 
         #endregion
 
-        
+
     }
 }

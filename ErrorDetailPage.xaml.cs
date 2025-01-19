@@ -219,6 +219,7 @@ namespace ElectronicCorrectionNotebook
                         CloseButtonText = "Ok 确定",
                         FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                         // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                        Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
                     };
                     await dialog.ShowAsync();
                 }
@@ -414,6 +415,7 @@ namespace ElectronicCorrectionNotebook
                         };
 
                         Dialog.Content = dialogImage;
+                        Dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
                         // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致
 
                         await Dialog.ShowAsync();
@@ -440,6 +442,7 @@ namespace ElectronicCorrectionNotebook
                         };
 
                         Dialog.Content = textBlockScrollViewer;
+                        Dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
                         // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致
                         await Dialog.ShowAsync();
                     }
@@ -459,6 +462,7 @@ namespace ElectronicCorrectionNotebook
 
                         Dialog.Content = dialogMediaPlayer;
                         Dialog.Closed += mediaDialog_Closed;
+                        Dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
                         // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致;
                         await Dialog.ShowAsync();
                     }
@@ -549,6 +553,7 @@ namespace ElectronicCorrectionNotebook
                     DefaultButton = ContentDialogButton.Close,
                     FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                     // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
                 };
                 await saveSuccess.ShowAsync();
             }
@@ -572,6 +577,7 @@ namespace ElectronicCorrectionNotebook
                 XamlRoot = this.Content.XamlRoot,
                 FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                 // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             var result = await confirmDialog.ShowAsync();
             PublicEvents.PlaySystemSound();
@@ -688,6 +694,7 @@ namespace ElectronicCorrectionNotebook
                 CloseButtonText = "Ok 确定",
                 FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                 // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await errorDialog.ShowAsync();
         }

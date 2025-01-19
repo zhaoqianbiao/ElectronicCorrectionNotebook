@@ -37,6 +37,7 @@ namespace ElectronicCorrectionNotebook
 
             // 在应用启动时加载设置
             LoadSettingsAsync();
+
         }
 
         // 加载设置
@@ -98,7 +99,8 @@ namespace ElectronicCorrectionNotebook
                 Content = $"{ex.Message}\n\n{ex.StackTrace}",
                 CloseButtonText = "Ok 确定",
                 XamlRoot = MainWindow.Content.XamlRoot, // 确保使用当前页面的 XamlRoot
-                // RequestedTheme = (ElementTheme)Microsoft.UI.Xaml.Application.Current.RequestedTheme // 设置主题与应用程序一致
+                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+                Style = Microsoft.UI.Xaml.Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await errorDialog.ShowAsync();
         }

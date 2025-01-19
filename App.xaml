@@ -6,7 +6,8 @@
     xmlns:local="using:ElectronicCorrectionNotebook"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    RequestedTheme="Light">
+    >
+    
     <Application.Resources>
 
         <ResourceDictionary>
