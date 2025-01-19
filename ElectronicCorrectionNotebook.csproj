@@ -19,8 +19,6 @@
 	</PropertyGroup>
   <ItemGroup>
     <None Remove="ErrorDetailPage.xaml" />
-    <None Remove="ResourceDict\DarkTheme.xaml" />
-    <None Remove="ResourceDict\LightTheme.xaml" />
     <None Remove="SettingsPage.xaml" />
   </ItemGroup>
 
@@ -97,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\excel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\githubBaby.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\HarmonyOS_Sans_Black.ttf">
@@ -300,16 +301,6 @@
     <Content Update="Assets\zip.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ResourceDict\DarkTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ResourceDict\LightTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 
 

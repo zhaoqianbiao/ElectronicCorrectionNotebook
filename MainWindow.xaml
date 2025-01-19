@@ -41,7 +41,7 @@
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0"/>
             </Grid.ColumnDefinitions>
 
-            <Image Source="ms-appx:///Assets/githubBaby.gif" HorizontalAlignment="Left" 
+            <Image x:Name="GitHubBaby" Source="ms-appx:///Assets/githubBaby.gif" HorizontalAlignment="Left" 
                    VerticalAlignment="Center" Width="30" Height="auto" Margin="10,0,0,0"/>
             <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
                 <Image x:Name="TitleBarIcon" 

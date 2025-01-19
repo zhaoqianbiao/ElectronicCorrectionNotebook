@@ -19,6 +19,7 @@ using Windows.Media.Core;
 using System.Diagnostics;
 using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI;
 
 namespace ElectronicCorrectionNotebook
 {
@@ -133,7 +134,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error selecting files", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -171,12 +172,6 @@ namespace ElectronicCorrectionNotebook
                                     string uniqueFileName = $"{Path.GetFileNameWithoutExtension(storageFile.Name)}_{Guid.NewGuid()}{Path.GetExtension(storageFile.Name)}";
                                     destinationPath = Path.Combine(filesFolder, uniqueFileName);
                                 }
-
-                                /*
-                                // string uniqueFileName = $"{storageFile.Name}";
-                                string uniqueFileName = $"{Guid.NewGuid()}_{storageFile.Name}";
-                                string destinationPath = Path.Combine(filesFolder, uniqueFileName);
-                                */
 
                                 await SaveFileToFixedPathAsync(storageFile, destinationPath);
                                 ErrorItem.FilePaths.Add(destinationPath);
@@ -222,7 +217,8 @@ namespace ElectronicCorrectionNotebook
                         Title = "Error 错误",
                         Content = "No images found 剪贴板中没有图像。",
                         CloseButtonText = "Ok 确定",
-                        FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
+                        FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                        // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
                     };
                     await dialog.ShowAsync();
                 }
@@ -231,7 +227,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening from clipboard", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -372,7 +368,7 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                await ShowErrorMessageAsync("Error deleting image", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -393,7 +389,7 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                await ShowErrorMessageAsync("Error copying file", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -418,6 +414,8 @@ namespace ElectronicCorrectionNotebook
                         };
 
                         Dialog.Content = dialogImage;
+                        // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致
+
                         await Dialog.ShowAsync();
                     }
                     // 显示预览txt文件
@@ -442,6 +440,7 @@ namespace ElectronicCorrectionNotebook
                         };
 
                         Dialog.Content = textBlockScrollViewer;
+                        // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致
                         await Dialog.ShowAsync();
                     }
                     // 预览播放视频或音频
@@ -460,6 +459,7 @@ namespace ElectronicCorrectionNotebook
 
                         Dialog.Content = dialogMediaPlayer;
                         Dialog.Closed += mediaDialog_Closed;
+                        // Dialog.RequestedTheme = (ElementTheme)Application.Current.RequestedTheme; // 设置主题与应用程序一致;
                         await Dialog.ShowAsync();
                     }
                     // 以默认方式打开其他类型的文件
@@ -476,7 +476,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening file", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -523,7 +523,7 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error opening image in system", ex);
+                await ShowErrorMessageAsync(ex);
             }
             finally
             {
@@ -539,7 +539,7 @@ namespace ElectronicCorrectionNotebook
             try
             {
                 await SaveCurrentContentAsync();
-
+                PublicEvents.PlaySystemSound();
                 ContentDialog saveSuccess = new ContentDialog()
                 {
                     XamlRoot = rootPanel.XamlRoot,
@@ -547,15 +547,15 @@ namespace ElectronicCorrectionNotebook
                     Content = "Save successfully 保存成功！",
                     CloseButtonText = "Ok",
                     DefaultButton = ContentDialogButton.Close,
-                    FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
+                    FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                    // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
                 };
-                PublicEvents.PlaySystemSound();
                 await saveSuccess.ShowAsync();
             }
             catch (Exception ex)
             {
                 // 处理异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error saving content", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -570,10 +570,12 @@ namespace ElectronicCorrectionNotebook
                 CloseButtonText = "No 否",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
-                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
+                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
             };
-            PublicEvents.PlaySystemSound();
             var result = await confirmDialog.ShowAsync();
+            PublicEvents.PlaySystemSound();
+
             if (result == ContentDialogResult.Primary)
             {
                 try
@@ -596,7 +598,7 @@ namespace ElectronicCorrectionNotebook
                     {
                         File.Delete(rtfFilePath);
                     }
-                    
+
 
                     var errorItems = await DataService.LoadDataAsync(cts.Token); // 取出总的errorItems List
                     var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id); // 在List中寻找和当前ErrorItem ID匹配的
@@ -609,12 +611,12 @@ namespace ElectronicCorrectionNotebook
                     var mainWindow = (MainWindow)App.MainWindow;
                     mainWindow.RemoveNavigationViewItem(ErrorItem); // 给navigationView传递要删除的当前的ErrorItem
 
-                    
+
                 }
                 catch (Exception ex)
                 {
                     // 处理异常，例如记录日志或显示错误消息
-                    await ShowErrorMessageAsync("Error deleting content", ex);
+                    await ShowErrorMessageAsync(ex);
                 }
             }
         }
@@ -671,20 +673,21 @@ namespace ElectronicCorrectionNotebook
             catch (Exception ex)
             {
                 // 处理其他异常，例如记录日志或显示错误消息
-                await ShowErrorMessageAsync("Error saving data", ex);
+                await ShowErrorMessageAsync(ex);
             }
         }
 
         // 显示错误消息
-        private async Task ShowErrorMessageAsync(string title, Exception ex)
+        private async Task ShowErrorMessageAsync(Exception ex)
         {
             var errorDialog = new ContentDialog()
             {
                 XamlRoot = this.Content.XamlRoot,
-                Title = title,
+                Title = "Error!",
                 Content = ex.Message,
                 CloseButtonText = "Ok 确定",
-                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]
+                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
             };
             await errorDialog.ShowAsync();
         }
@@ -802,11 +805,6 @@ namespace ElectronicCorrectionNotebook
             DescriptionRichEditBox.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
         }
 
-
-        /*private void DescriptionRichEditBox_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            DescriptionRichEditBox.Document.Selection.SetRange(0, 0);
-        }*/
 
         #endregion
     }

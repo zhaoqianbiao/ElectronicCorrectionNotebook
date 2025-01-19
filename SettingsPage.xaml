@@ -41,26 +41,31 @@
             <Button Content="Export 导出" Click="ExportDataButton_Click"/>
         </controls:SettingsCard>
 
-        <controls:SettingsCard Header="Theme 主题">
-            <controls:SettingsCard.HeaderIcon>
-                <FontIcon Glyph="&#xE790;" />
-            </controls:SettingsCard.HeaderIcon>
-            <ToggleSwitch AutomationProperties.Name="simpleToggleSwitch" Toggled="ThemeToggleSwitch_Toggled"/>
-        </controls:SettingsCard>
-
         <controls:SettingsCard Header="Auto Save 自动保存" Description="All changes will be saved when the program is closed, but you can also save manually.&#x0a;程序关闭时会保存所有更改，但您也可随时手动保存">
             <controls:SettingsCard.HeaderIcon>
                 <FontIcon Glyph="&#xE74E;" />
             </controls:SettingsCard.HeaderIcon>
+        </controls:SettingsCard>
+        
+        <controls:SettingsCard Header="Dark Theme 黑暗主题" Description="因有顽固bug 暂不开放">
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE790;" />
+            </controls:SettingsCard.HeaderIcon>
+            <ToggleSwitch x:Name="themeToggleSwitch" Toggled="ThemeToggleSwitch_Toggled" IsEnabled="False"/>
         </controls:SettingsCard>
 
         <controls:SettingsCard Header="Sound 操作音效" Description="操作声音">
             <controls:SettingsCard.HeaderIcon>
                 <FontIcon Glyph="&#xEC4F;" />
             </controls:SettingsCard.HeaderIcon>
-            <ToggleSwitch Toggled="SoundToggleSwitch_Toggled"/>
+            <ToggleSwitch x:Name="soundToggleSwitch" Toggled="SoundToggleSwitch_Toggled"/>
         </controls:SettingsCard>
 
-        
+        <controls:SettingsCard Header="GitHub Baby" Description="Gif开关">
+            <controls:SettingsCard.HeaderIcon>
+                <FontIcon Glyph="&#xE805;" />
+            </controls:SettingsCard.HeaderIcon>
+            <ToggleSwitch x:Name="gifToggleSwitch" Toggled="GifToggleSwitch_Toggled"/>
+        </controls:SettingsCard>
     </StackPanel>
 </Page>

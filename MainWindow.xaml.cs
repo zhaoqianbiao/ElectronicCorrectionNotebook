@@ -79,14 +79,7 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                ContentDialog errorDialog = new ContentDialog
-                {
-                    Title = "Error 错误",
-                    Content = ex,
-                    CloseButtonText = "Ok",
-                    XamlRoot = this.Content.XamlRoot
-                };
-                var result = await errorDialog.ShowAsync();
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -103,14 +96,7 @@ namespace ElectronicCorrectionNotebook
             }
             catch (Exception ex)
             {
-                ContentDialog errorDialog = new ContentDialog
-                {
-                    Title = "Error 错误",
-                    Content = ex,
-                    CloseButtonText = "Ok",
-                    XamlRoot = this.Content.XamlRoot
-                };
-                var result = await errorDialog.ShowAsync();
+                await ShowErrorMessageAsync(ex);
             }
         }
 
@@ -163,7 +149,7 @@ namespace ElectronicCorrectionNotebook
             nvSample.MenuItems.Add(newItem);
         }
 
-        // 添加新错题-总步骤-已改
+        // 添加新错题-总步骤
         private async void Add_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var newErrorItem = new ErrorItem
@@ -192,7 +178,7 @@ namespace ElectronicCorrectionNotebook
             };
 
 
-            SolidColorBrush color = null;
+            /*SolidColorBrush color = null;
             if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
             {
                 color = new SolidColorBrush(Colors.White);
@@ -200,9 +186,9 @@ namespace ElectronicCorrectionNotebook
             else
             {
                 color = new SolidColorBrush(Colors.Black);
-            }
+            }*/
 
-            aboutInfo.Inlines.Add(new Run { Text = "Created by ", Foreground = color });
+            aboutInfo.Inlines.Add(new Run { Text = "Created by " });
 
             Hyperlink hyperlink = new Hyperlink();
             hyperlink.Inlines.Add(new Run { Text = "@QuincyZhao😀" });
@@ -210,7 +196,7 @@ namespace ElectronicCorrectionNotebook
             hyperlink.Foreground = new SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
 
             aboutInfo.Inlines.Add(hyperlink);
-            aboutInfo.Inlines.Add(new Run { Text = " in GCGS", Foreground = color });
+            aboutInfo.Inlines.Add(new Run { Text = " in GCGS" });
             aboutInfo.FontFamily = (FontFamily)Application.Current.Resources["FontRegular"];
 
             Image aboutImage = new Image()
@@ -230,7 +216,8 @@ namespace ElectronicCorrectionNotebook
                 Title = "About",
                 FontFamily = (FontFamily)Application.Current.Resources["FontBold"],
                 Content = contentPanel,
-                CloseButtonText = "Ok"
+                CloseButtonText = "Ok",
+                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
             };
             await about.ShowAsync();
         }
@@ -310,29 +297,6 @@ namespace ElectronicCorrectionNotebook
         // 窗口关闭时-不用改
         public async void MainWindow_Closed(object sender, WindowEventArgs args)
         {
-            /*
-            args.Handled = true;
-
-            ContentDialog confirmDialog = new ContentDialog
-            {
-                Title = "Confirm to exit 确认退出",
-                Content = "Are you sure to save and exit? 你确定要保存数据并退出吗？",
-                PrimaryButtonText = "Yes 是",
-                CloseButtonText = "No 否",
-                DefaultButton = ContentDialogButton.Close,
-                XamlRoot = this.Content.XamlRoot // 确保 XamlRoot 设置正确
-            };
-            PublicEvents.PlaySystemSound();
-            var result = await confirmDialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                await SaveCurrentStateAsync();
-                this.Closed -= MainWindow_Closed;
-                Application.Current.Exit();
-            }
-            */
-
             await SaveCurrentStateAsync();
             this.Closed -= MainWindow_Closed;
             Application.Current.Exit();
@@ -378,6 +342,21 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
+        // 显示错误消息
+        private async Task ShowErrorMessageAsync(Exception ex)
+        {
+            var errorDialog = new ContentDialog()
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = "Error!",
+                Content = ex.Message,
+                CloseButtonText = "Ok 确定",
+                FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
+            };
+            await errorDialog.ShowAsync();
+        }
+
         #region AutoSuggestBoxCodeRegion
 
         // 在搜索框中输入的时候更改建议列表
@@ -407,8 +386,6 @@ namespace ElectronicCorrectionNotebook
                 {
                     if (item.Title == args.ChosenSuggestion)
                     {
-                        // 为什么要把下面这行注释掉才能好呢，为什么导航两次会导致数据丢失？
-                        // contentFrame.Navigate(typeof(ErrorDetailPage), item);
                         SelectNavigationViewItem(item); // 自动选中对应的item
                         break;
                     }
@@ -420,7 +397,6 @@ namespace ElectronicCorrectionNotebook
                 {
                     if (item.Title == args.QueryText)
                     {
-                        // contentFrame.Navigate(typeof(ErrorDetailPage), item);
                         SelectNavigationViewItem(item); // 自动选中对应的item
                         break;
                     }

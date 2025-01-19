@@ -8,6 +8,8 @@ namespace ElectronicCorrectionNotebook.DataStructure
 {
     public class Settings
     {
-        public string Theme { get; set; }
+        public bool IsThemeDark { get; set; }
+        public bool IsSoundEnabled { get; set; }
+        public bool IsGifEnabled { get; set; }
     }
 }
