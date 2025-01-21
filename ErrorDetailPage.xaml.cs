@@ -19,7 +19,6 @@ using Windows.Media.Core;
 using System.Diagnostics;
 using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI;
 
 namespace ElectronicCorrectionNotebook
 {

@@ -10,12 +10,11 @@ using System.Threading;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.Core;
-using Microsoft.UI;           // Needed for WindowId.
+using Microsoft.UI;           
 using System.Runtime.InteropServices;
 using WinRT;
 using PInvoke;
 using ElectronicCorrectionNotebook.DataStructure;
-using Microsoft.UI.Text;
 
 namespace ElectronicCorrectionNotebook
 {

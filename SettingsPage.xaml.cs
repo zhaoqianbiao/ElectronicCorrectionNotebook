@@ -1,9 +1,7 @@
 using ElectronicCorrectionNotebook.DataStructure;
 using ElectronicCorrectionNotebook.Services;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.IO;
 using System.Text.Json;

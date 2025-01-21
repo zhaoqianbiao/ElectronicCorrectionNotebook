@@ -2,15 +2,12 @@
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 using WinRT.Interop;
-using Windows.ApplicationModel.Core;
 using ElectronicCorrectionNotebook.DataStructure;
 using System.IO;
 using System.Text.Json;
 using System;
 using Microsoft.UI.Xaml.Controls;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-using CommunityToolkit.WinUI.Controls;
 
 namespace ElectronicCorrectionNotebook
 {
