@@ -9,7 +9,8 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
-    x:Name="rootPage">
+    x:Name="rootPage"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <StackPanel Margin="30,23,30,0" x:Name="rootPanel">
 
@@ -37,7 +38,6 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            
             <StackPanel x:Name="leftZone" Orientation="Vertical" Grid.Column="0">
                 <Grid>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
@@ -47,11 +47,13 @@
                     <RatingControl IsClearEnabled="True" x:Name="RatingChoose"
                             IsReadOnly="False" Caption="Importance"
                             HorizontalAlignment="Right" Margin="0,5,10,0"
-                            VerticalAlignment="Center">
+                            VerticalAlignment="Center"
+                            Value="{Binding ErrorItem.Rating, Mode=TwoWay}">
                     </RatingControl>
                 </Grid>
-                <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged" 
-                        FontSize="15" Margin="0,0,0,10"/>
+                <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged"
+                         Text="{Binding ErrorItem.Title, Mode=TwoWay}"
+                         FontSize="15" Margin="0,0,0,10"/>
             </StackPanel>
 
             <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" Margin="25,0,0,0">
@@ -65,12 +67,7 @@
                         <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0"  Grid.Column="1" 
                                 HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <Button Margin="8,0,0,0" Grid.Column="2" HorizontalAlignment="Right" Height="32">
-                        <FontIcon Glyph="&#xE710;"/>
-                    </Button>
                 </Grid>
-                <TextBox x:Name="TagBox" TextChanged="TagBox_TextChanged" 
-                            FontSize="15" Margin="0,5,0,10"/>
             </StackPanel>
 
             <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,0,0,0">
@@ -94,7 +91,8 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
-            <CalendarDatePicker x:Name="DatePicker"  PlaceholderText="Pick a date" CornerRadius="8"/>
+            <CalendarDatePicker x:Name="DatePicker" Date="{Binding ErrorItem.Date, Mode=TwoWay}"
+                                PlaceholderText="Pick a date" CornerRadius="8"/>
             <Button Content="Today 今天" Click="SetDateToTodayClick" Margin="5,0,0,0"/>
         </StackPanel>
 

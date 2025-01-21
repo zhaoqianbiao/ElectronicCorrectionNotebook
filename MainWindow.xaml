@@ -6,6 +6,7 @@
     xmlns:local="using:ElectronicCorrectionNotebook"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:ElectronicCorrectionNotebook.DataStructure"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
@@ -58,6 +59,7 @@
         </Grid>
 
         <NavigationView x:Name="nvSample"
+            MenuItemsSource="{x:Bind ErrorItems}"
             IsSettingsVisible="True"
             IsBackButtonVisible="Collapsed"
             IsBackEnabled="False"
@@ -73,6 +75,12 @@
             Margin="0,0,0,0"
             OpenPaneLength="300"
             Grid.Row="1">
+
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate x:DataType="data:ErrorItem">
+                    <NavigationViewItem Content="{x:Bind Title, Mode=OneWay}" Tag="{x:Bind}" Icon="Comment" />
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
 
             <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox PlaceholderText="Search Correction" QueryIcon="Find" AutomationProperties.Name="Search" 

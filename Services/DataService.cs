@@ -6,6 +6,7 @@ using System.Text.Json;
 using Windows.Storage;
 using System.Threading;
 using ElectronicCorrectionNotebook.DataStructure;
+using System.Collections.ObjectModel;
 
 namespace ElectronicCorrectionNotebook.Services
 {
@@ -46,7 +47,7 @@ namespace ElectronicCorrectionNotebook.Services
         }
 
         // 保存数据 序列化
-        public static async Task SaveDataAsync(List<ErrorItem> errorItems, CancellationToken token)
+        public static async Task SaveDataAsync(ObservableCollection<ErrorItem> errorItems, CancellationToken token)
         {
             var json = JsonSerializer.Serialize(errorItems);
             await File.WriteAllTextAsync(JsonFilePath, json, token);

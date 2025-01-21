@@ -19,23 +19,37 @@ using Windows.Media.Core;
 using System.Diagnostics;
 using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI.Xaml.Media;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace ElectronicCorrectionNotebook
 {
-    public sealed partial class ErrorDetailPage : Page
+    public sealed partial class ErrorDetailPage : Page, INotifyPropertyChanged
     {
-        //创建错题对象
-        public ErrorItem ErrorItem { get; set; }
-        // 数据路径
+        private ErrorItem errorItem;
+        public ErrorItem ErrorItem 
+        { 
+            get => errorItem;
+            set 
+            { 
+                errorItem = value;
+                OnPropertyChanged();
+            }
+        }
+
         private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
         private CancellationTokenSource cts;
 
-        // Image类级别字段
         private Microsoft.UI.Xaml.Controls.Image dialogImage; 
-        // Textblock类级别字段
         private TextBlock dialogTextBlock;
-        // MediaPlayerElement类级别字段
         private MediaPlayerElement dialogMediaPlayer;
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         // 初始化页面
         public ErrorDetailPage()
@@ -44,18 +58,13 @@ namespace ElectronicCorrectionNotebook
             cts = new CancellationTokenSource();
         }
 
-        // 导航到页面 绑定数据到UI控件
+        // 导航到页面 Binding自动绑定数据到UI控件
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             ErrorItem = e.Parameter as ErrorItem;
             if (ErrorItem != null)
             {
-                // 绑定数据到UI控件
-                TitleTextBox.Text = ErrorItem.Title;
-                TagBox.Text = ErrorItem.CorrectionTag;
-                DatePicker.Date = ErrorItem.Date;
-
                 // 获取软件数据文件夹路径
                 StorageFolder localFolder = await StorageFolder.GetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook"));
                 StorageFolder rtfFolder = await localFolder.CreateFolderAsync("rtfFiles", CreationCollisionOption.OpenIfExists);
@@ -350,18 +359,6 @@ namespace ElectronicCorrectionNotebook
                     File.Delete(filePath);
                 }
 
-                var errorItems = await DataService.LoadDataAsync(cts.Token);
-                var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
-                if (existingItem != null)
-                {
-                    existingItem.FilePaths = ErrorItem.FilePaths;
-                }
-                else
-                {
-                    errorItems.Add(ErrorItem);
-                }
-                await DataService.SaveDataAsync(errorItems, cts.Token);
-
                 // 重新显示文件图标
                 DisplayFilesIcon();
                 await SaveCurrentContentAsync();
@@ -575,11 +572,9 @@ namespace ElectronicCorrectionNotebook
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
                 FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
-                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             var result = await confirmDialog.ShowAsync();
-            PublicEvents.PlaySystemSound();
 
             if (result == ContentDialogResult.Primary)
             {
@@ -595,8 +590,6 @@ namespace ElectronicCorrectionNotebook
                     }
 
                     // 删除本地rtfFiles里的对应文件
-                    // 下面的不能用，不知道为啥
-                    // string rtfFilePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "rtfFiles", $"{ErrorItem.Id}.rtf");
                     string rtfFilePath = Path.Combine(appDataPath, "rtfFiles", $"{ErrorItem.Id}.rtf");
 
                     if (File.Exists(rtfFilePath))
@@ -604,18 +597,8 @@ namespace ElectronicCorrectionNotebook
                         File.Delete(rtfFilePath);
                     }
 
-
-                    var errorItems = await DataService.LoadDataAsync(cts.Token); // 取出总的errorItems List
-                    var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id); // 在List中寻找和当前ErrorItem ID匹配的
-                    if (existingItem != null)
-                    {
-                        errorItems.Remove(existingItem); // 删去当前的那个item
-                    }
-                    await DataService.SaveDataAsync(errorItems, cts.Token); // 保存errorItems List
-
                     var mainWindow = (MainWindow)App.MainWindow;
                     mainWindow.RemoveNavigationViewItem(ErrorItem); // 给navigationView传递要删除的当前的ErrorItem
-
 
                 }
                 catch (Exception ex)
@@ -629,22 +612,14 @@ namespace ElectronicCorrectionNotebook
         // 日期设置为今天
         private void SetDateToTodayClick(object sender, RoutedEventArgs e)
         {
-            ErrorItem.Date = DateTime.Now;
-            DatePicker.Date = ErrorItem.Date;
+            DatePicker.Date = DateTime.Now;
         }
 
         // 保存当前内容
         public async Task SaveCurrentContentAsync()
         {
-            // 保存到对象
-            ErrorItem.Title = TitleTextBox.Text;
-            ErrorItem.CorrectionTag = TagBox.Text;
-            ErrorItem.Date = DatePicker.Date;
-            ErrorItem.Rating = RatingChoose.Value;
-
             try
             {
-                // 获取软件数据文件夹路径
                 StorageFolder localFolder = await StorageFolder.GetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook"));
                 StorageFolder rtfFolder = await localFolder.CreateFolderAsync("rtfFiles", CreationCollisionOption.OpenIfExists);
                 string rtfFileName = $"{ErrorItem.Id}.rtf";
@@ -656,20 +631,9 @@ namespace ElectronicCorrectionNotebook
                     DescriptionRichEditBox.Document.SaveToStream(Microsoft.UI.Text.TextGetOptions.FormatRtf, stream);
                 }
 
-                var errorItems = await DataService.LoadDataAsync(cts.Token);
-                var existingItem = errorItems.FirstOrDefault(item => item.Id == ErrorItem.Id);
-                if (existingItem != null)
-                {
-                    existingItem.Title = ErrorItem.Title;
-                    existingItem.Date = ErrorItem.Date;
-                    existingItem.FilePaths = ErrorItem.FilePaths;
-                    existingItem.Rating = ErrorItem.Rating;
-                }
-                else
-                {
-                    errorItems.Add(ErrorItem);
-                }
-                await DataService.SaveDataAsync(errorItems, cts.Token);
+                // 调用 MainWindow 的 SaveDataAsync 方法保存整个集合
+                var mainWindow = (MainWindow)App.MainWindow;
+                await mainWindow.SaveDataAsync(cts.Token);
             }
             catch (OperationCanceledException)
             {
@@ -729,26 +693,10 @@ namespace ElectronicCorrectionNotebook
             await FileIO.WriteTextAsync(file, text_Content);
         }
 
-        // tag文本框内容改变时 更新对象 更新列表项目名称
-        private void TagBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ErrorItem != null)
-            {
-                ErrorItem.CorrectionTag = TagBox.Text;
-                var mainWindow = (MainWindow)App.MainWindow;
-                mainWindow.UpdateNavigationViewItem(ErrorItem);
-            }
-        }
-
         // title文本框内容改变时 更新对象 更新列表项目名称
         private void TitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (ErrorItem != null)
-            {
-                ErrorItem.Title = TitleTextBox.Text;
-                var mainWindow = (MainWindow)App.MainWindow;
-                mainWindow.UpdateNavigationViewItem(ErrorItem);
-            }
+            ErrorItem.Title = TitleTextBox.Text;
         }
 
         // 刷新按钮点击事件

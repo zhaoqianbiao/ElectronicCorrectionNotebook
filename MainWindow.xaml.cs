@@ -15,13 +15,15 @@ using System.Runtime.InteropServices;
 using WinRT;
 using PInvoke;
 using ElectronicCorrectionNotebook.DataStructure;
+using Microsoft.UI.Xaml.Data;
+using System.Collections.ObjectModel;
 
 namespace ElectronicCorrectionNotebook
 {
 
     public sealed partial class MainWindow : Window
     {
-        private List<ErrorItem> errorItems = new List<ErrorItem>();
+        public ObservableCollection<ErrorItem> ErrorItems { get; set; } = new ObservableCollection<ErrorItem>();
         private CancellationTokenSource cts;
 
         private const int MinWidth = 1250;  // 设置最小宽度
@@ -38,21 +40,18 @@ namespace ElectronicCorrectionNotebook
 
             // var acry = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
             
-
             this.SystemBackdrop = micaBackdrop;
 
             SubClassing();
             Closed += MainWindow_Closed;
             CoreApplication.Exiting += OnExiting;
 
-            // 初始化 AppWindow
             var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
             appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
 
             appWindow.SetIcon("Assets/im.ico");
             cts = new CancellationTokenSource();
-            // 加载数据
             _ = LoadDataAsync(cts.Token);
 
             ExtendsContentIntoTitleBar = true;
@@ -60,18 +59,33 @@ namespace ElectronicCorrectionNotebook
 
         }
 
-        // 加载数据-从json中读取数据-不用改
-        private async Task LoadDataAsync(CancellationToken token)
+        // 加载数据-从json中读取数据
+        public async Task LoadDataAsync(CancellationToken token)
         {
             try
             {
-                // List<ErrorItems> errorItems 获取数据
-                errorItems = await DataService.LoadDataAsync(token);
-                foreach (var item in errorItems)
+                var items = await DataService.LoadDataAsync(token);
+                foreach (var item in items)
                 {
-                    // 添加导航视图项 入口
-                    AddNavigationViewItem(item);
+                    ErrorItems.Add(item);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessageAsync(ex);
+            }
+        }
+
+        // 存储数据-把数据存储到json-调用DataServie
+        public async Task SaveDataAsync(CancellationToken token)
+        {
+            try
+            {
+                await DataService.SaveDataAsync(ErrorItems, token);
             }
             catch (OperationCanceledException)
             {
@@ -81,72 +95,6 @@ namespace ElectronicCorrectionNotebook
             {
                 await ShowErrorMessageAsync(ex);
             }
-        }
-
-        // 存储数据-把数据存储到json-调用DataServie-不用改
-        private async Task SaveDataAsync(CancellationToken token)
-        {
-            try
-            {
-                await DataService.SaveDataAsync(errorItems, token);
-            }
-            catch (OperationCanceledException)
-            {
-                // Handle cancellation
-            }
-            catch (Exception ex)
-            {
-                await ShowErrorMessageAsync(ex);
-            }
-        }
-
-        // 导航栏中添加新项-不用改
-        private void AddNavigationViewItem(ErrorItem errorItem)
-        {
-            // 创建Grid布局
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            // 标题
-            var titleTextBlock = new TextBlock
-            {
-                Text = errorItem.Title,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            Grid.SetColumn(titleTextBlock, 0);
-
-            // 用于显示胶囊的框框
-            var tagBorder = new Border
-            {
-                Background = new SolidColorBrush(ColorHelper.FromArgb(225, 255, 194, 37)),
-                CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(5, 1, 5, 1),
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Right,
-                Child = new TextBlock
-                {
-                    Text = errorItem.CorrectionTag,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 13,
-                    FontFamily = (FontFamily)Application.Current.Resources["FontBold"]
-                }
-            };
-            Grid.SetColumn(tagBorder, 1);
-
-            // 将标题和胶囊添加到Grid中
-            grid.Children.Add(titleTextBlock);
-            grid.Children.Add(tagBorder);
-
-            // item，把总的stackPanel放进去
-            var newItem = new NavigationViewItem
-            {
-                Content = grid,
-                Icon = new SymbolIcon(Symbol.Comment),
-                Tag = errorItem,
-            };
-
-            nvSample.MenuItems.Add(newItem);
         }
 
         // 添加新错题-总步骤
@@ -156,16 +104,14 @@ namespace ElectronicCorrectionNotebook
             {
                 Title = "New Error",
                 Date = DateTime.Now,
-                CorrectionTag = "Empty Tag",
                 FilePaths = new List<string>(),
                 Rating = -1,
             };
-            errorItems.Add(newErrorItem);
-            AddNavigationViewItem(newErrorItem);
+            ErrorItems.Add(newErrorItem);
             await SaveDataAsync(cts.Token);
         }
 
-        // 关于-不用改
+        // 关于
         private async void About_Tapped(object sender, TappedRoutedEventArgs e)
         {
             
@@ -214,59 +160,9 @@ namespace ElectronicCorrectionNotebook
             
         }
 
-        // 当title和tag更改时，更新导航视图项的名字-不用改
-        public void UpdateNavigationViewItem(ErrorItem errorItem)
-        {
-            foreach (var menuItem in nvSample.MenuItems)
-            {
-                if (menuItem is NavigationViewItem item && item.Tag == errorItem)
-                {
-                    // 创建Grid布局
-                    var grid = new Grid();
-                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                    // 标题
-                    var titleTextBlock = new TextBlock
-                    {
-                        Text = errorItem.Title,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    Grid.SetColumn(titleTextBlock, 0);
-
-                    // 用于显示胶囊的框框
-                    var tagBorder = new Border
-                    {
-                        Background = new SolidColorBrush(ColorHelper.FromArgb(225, 255, 194, 37)),
-                        CornerRadius = new CornerRadius(5),
-                        Padding = new Thickness(5, 1, 5, 1),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        HorizontalAlignment = HorizontalAlignment.Right,
-                        Child = new TextBlock
-                        {
-                            Text = errorItem.CorrectionTag,
-                            FontSize = 13,
-                            VerticalAlignment = VerticalAlignment.Center,
-                            FontFamily = (FontFamily)Application.Current.Resources["FontBold"]
-                        }
-                    };
-                    Grid.SetColumn(tagBorder, 1);
-
-                    // 将标题和胶囊添加到Grid中
-                    grid.Children.Add(titleTextBlock);
-                    grid.Children.Add(tagBorder);
-
-                    item.Content = grid;
-                    break;
-                }
-
-            }
-        }
-
-        // 导航视图选择更改时-不用改
+        // 导航视图选择更改时
         public async void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            // 自动保存
             if (contentFrame.Content is ErrorDetailPage currentPage)
             {
                 await currentPage.SaveCurrentContentAsync();
@@ -276,9 +172,9 @@ namespace ElectronicCorrectionNotebook
             {
                 contentFrame.Navigate(typeof(SettingsPage));
             }
-            else if (args.SelectedItemContainer != null)
+            else if (args.SelectedItem != null)
             {
-                var selectedErrorItem = args.SelectedItemContainer.Tag as ErrorItem;
+                var selectedErrorItem = args.SelectedItem as ErrorItem;
                 if (selectedErrorItem != null)
                 {
                     contentFrame.Navigate(typeof(ErrorDetailPage), selectedErrorItem);
@@ -286,7 +182,7 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        // 窗口关闭时-不用改
+        // 窗口关闭时
         public async void MainWindow_Closed(object sender, WindowEventArgs args)
         {
             await SaveCurrentStateAsync();
@@ -294,13 +190,13 @@ namespace ElectronicCorrectionNotebook
             Application.Current.Exit();
         }
 
-        // 应用程序退出时-不用改
+        // 应用程序退出时
         private async void OnExiting(object sender, object e)
         {
             await SaveCurrentStateAsync();
         }
 
-        // 保存当前状态-不用改
+        // 保存当前状态
         private async Task SaveCurrentStateAsync()
         {
             if (contentFrame.Content is ErrorDetailPage currentPage)
@@ -308,15 +204,13 @@ namespace ElectronicCorrectionNotebook
                 await currentPage.SaveCurrentContentAsync();
             }
             await SaveDataAsync(cts.Token);
-            cts.Cancel(); // 
+            cts.Cancel();
         }
 
         // 删除项-不用改
         public async void RemoveNavigationViewItem(ErrorItem errorItem)
         {
-            var selectedItem = nvSample.SelectedItem;
-            nvSample.MenuItems.Remove(selectedItem);
-            errorItems.Remove(errorItem);
+            ErrorItems.Remove(errorItem);
             await SaveDataAsync(cts.Token);
             contentFrame.Content = null;
         }
@@ -358,7 +252,7 @@ namespace ElectronicCorrectionNotebook
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 var suggestions = new List<string>();
-                foreach (var item in errorItems)
+                foreach (var item in ErrorItems)
                 {
                     if (item.Title.Contains(sender.Text, StringComparison.OrdinalIgnoreCase))
                     {
@@ -375,7 +269,7 @@ namespace ElectronicCorrectionNotebook
         {
             if (args.ChosenSuggestion != null)
             {
-                foreach (var item in errorItems)
+                foreach (var item in ErrorItems)
                 {
                     if (item.Title == (string)args.ChosenSuggestion)
                     {
@@ -386,7 +280,7 @@ namespace ElectronicCorrectionNotebook
             }
             else if (!string.IsNullOrEmpty(args.QueryText))
             {
-                foreach (var item in errorItems)
+                foreach (var item in ErrorItems)
                 {
                     if (item.Title == args.QueryText)
                     {
@@ -459,7 +353,5 @@ namespace ElectronicCorrectionNotebook
         }
 
         #endregion
-
-
     }
 }
