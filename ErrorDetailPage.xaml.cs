@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Linq;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using ElectronicCorrectionNotebook.Services;
@@ -21,11 +20,32 @@ using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Microsoft.UI;
+using System.Collections.ObjectModel;
+using CommunityToolkit.WinUI.Controls;
+using System.Linq;
+using System.Collections.Specialized;
 
 namespace ElectronicCorrectionNotebook
 {
     public sealed partial class ErrorDetailPage : Page, INotifyPropertyChanged
     {
+        #region Binding Properties
+
+        private MainWindow _mainWindow;
+        public MainWindow MainWindowInstance
+        {
+            get => _mainWindow;
+            set
+            {
+                if (_mainWindow != value)
+                {
+                    _mainWindow = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private ErrorItem errorItem;
         public ErrorItem ErrorItem 
         { 
@@ -37,13 +57,27 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
-        private CancellationTokenSource cts;
+        private Brush _selectedFontColor = new SolidColorBrush(Colors.Black);
+        public Brush SelectedFontColor
+        {
+            get => _selectedFontColor;
+            set
+            {
+                _selectedFontColor = value;
+                OnPropertyChanged();
+            }
+        }
 
-        private Microsoft.UI.Xaml.Controls.Image dialogImage; 
-        private TextBlock dialogTextBlock;
-        private MediaPlayerElement dialogMediaPlayer;
-
+        private Brush _selectedHLColor = new SolidColorBrush(Colors.Transparent);
+        public Brush SelectedHLColor
+        {
+            get => _selectedHLColor;
+            set
+            {
+                _selectedHLColor = value;
+                OnPropertyChanged();
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -51,11 +85,60 @@ namespace ElectronicCorrectionNotebook
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        #endregion
+
+        private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
+        private CancellationTokenSource cts;
+
+        private Microsoft.UI.Xaml.Controls.Image dialogImage; 
+        private TextBlock dialogTextBlock;
+        private MediaPlayerElement dialogMediaPlayer;
+
         // 初始化页面
         public ErrorDetailPage()
         {
             this.InitializeComponent();
             cts = new CancellationTokenSource();
+            this.MainWindowInstance = (MainWindow)App.MainWindow;
+            this.DataContext = this;
+
+        }
+
+        private void TagItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TagItem newItem in e.NewItems)
+                {
+                    if (!MainWindowInstance.SuggestedTagList
+                            .Any(tag => string.Equals(tag.Name, newItem.Name, StringComparison.Ordinal)))
+                    {
+                        MainWindowInstance.SuggestedTagList.Add(newItem);
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TagItem oldItem in e.OldItems)
+                {
+                    var tagToRemove = MainWindowInstance.SuggestedTagList
+                        .FirstOrDefault(tag => string.Equals(tag.Name, oldItem.Name, StringComparison.Ordinal));
+                    if (tagToRemove != null)
+                    {
+                        MainWindowInstance.SuggestedTagList.Remove(tagToRemove);
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                MainWindowInstance.SuggestedTagList.Clear();
+            }
+
+            // 临时解决方案
+            /*if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                MainWindowInstance.UpdateSuggestedTagList();
+            }*/
         }
 
         // 导航到页面 Binding自动绑定数据到UI控件
@@ -65,6 +148,13 @@ namespace ElectronicCorrectionNotebook
             ErrorItem = e.Parameter as ErrorItem;
             if (ErrorItem != null)
             {
+                if (ErrorItem.TagItems == null)
+                {
+                    ErrorItem.TagItems = new ObservableCollection<TagItem>();
+                }
+                // 在这里订阅 TagItems 的 CollectionChanged 事件
+                ErrorItem.TagItems.CollectionChanged += TagItems_CollectionChanged;
+
                 // 获取软件数据文件夹路径
                 StorageFolder localFolder = await StorageFolder.GetFolderFromPathAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook"));
                 StorageFolder rtfFolder = await localFolder.CreateFolderAsync("rtfFiles", CreationCollisionOption.OpenIfExists);
@@ -99,6 +189,17 @@ namespace ElectronicCorrectionNotebook
 
                 RatingChoose.Value = ErrorItem.Rating;
                 DisplayFilesIcon();
+            }
+        }
+
+        // 离开后取消订阅
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+
+            if (ErrorItem != null && ErrorItem.TagItems != null)
+            {
+                ErrorItem.TagItems.CollectionChanged -= TagItems_CollectionChanged;
             }
         }
 
@@ -656,7 +757,6 @@ namespace ElectronicCorrectionNotebook
                 Content = ex.Message,
                 CloseButtonText = "Ok 确定",
                 FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
-                // RequestedTheme = (ElementTheme)Application.Current.RequestedTheme // 设置主题与应用程序一致
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
             };
             await errorDialog.ShowAsync();
@@ -691,12 +791,6 @@ namespace ElectronicCorrectionNotebook
             var file = await folder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
 
             await FileIO.WriteTextAsync(file, text_Content);
-        }
-
-        // title文本框内容改变时 更新对象 更新列表项目名称
-        private void TitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ErrorItem.Title = TitleTextBox.Text;
         }
 
         // 刷新按钮点击事件
@@ -740,6 +834,11 @@ namespace ElectronicCorrectionNotebook
             var rectangle = (Microsoft.UI.Xaml.Shapes.Rectangle)clickedColor.Content;
             var color = ((Microsoft.UI.Xaml.Media.SolidColorBrush)rectangle.Fill).Color;
 
+            if (sender is Button btn && btn.Content is Microsoft.UI.Xaml.Shapes.Rectangle rect && rect.Fill is SolidColorBrush brush)
+            {
+                SelectedFontColor = brush;
+            }
+
             DescriptionRichEditBox.Document.Selection.CharacterFormat.ForegroundColor = color;
 
             fontColorButton.Flyout.Hide();
@@ -753,12 +852,68 @@ namespace ElectronicCorrectionNotebook
             var rectangle = (Microsoft.UI.Xaml.Shapes.Rectangle)clickedColor.Content;
             var color = ((Microsoft.UI.Xaml.Media.SolidColorBrush)rectangle.Fill).Color;
 
+            if (sender is Button btn && btn.Content is Microsoft.UI.Xaml.Shapes.Rectangle rect && rect.Fill is SolidColorBrush brush)
+            {
+                SelectedHLColor = brush;
+            }
+
             DescriptionRichEditBox.Document.Selection.CharacterFormat.BackgroundColor = color;
 
             fontColorButton.Flyout.Hide();
             DescriptionRichEditBox.Focus(Microsoft.UI.Xaml.FocusState.Keyboard);
         }
 
+
+        #endregion
+
+        #region TokenizingTextBox
+
+        private async void TokenBox_TokenItemAdding(object sender, TokenItemAddingEventArgs e)
+        {
+            // 去除输入文本的前后空格
+            string tokenText = e.TokenText.Trim();
+
+            // 检查标签是否已存在
+            bool isDuplicate = ErrorItem.TagItems
+                .Any(item => string.Equals(item.Name, tokenText, StringComparison.Ordinal));
+
+            if (isDuplicate)
+            {
+                // 如果存在重复，则取消添加
+                e.Cancel = true;
+
+                // 可选：向用户显示提示消息
+                var duplicateDialog = new ContentDialog
+                {
+                    XamlRoot = this.Content.XamlRoot,
+                    Title = "Repetition 重复标签",
+                    Content = $"Tag 标签 \"{tokenText}\" 已存在",
+                    CloseButtonText = "Ok 确定",
+                    FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
+                };
+                await duplicateDialog.ShowAsync();
+            }
+            else
+            {
+                // 如果不存在，则创建并添加新的标签项
+                var newTag = new TagItem
+                {
+                    Name = tokenText
+                };
+                // **关键：设置 e.Item，以便 TokenizingTextBox 知道要添加的项**
+                e.Item = newTag;
+
+                // 临时解决方案
+                // 更新 SuggestedTagList
+                /*if (!MainWindowInstance.SuggestedTagList
+                        .Any(tag => string.Equals(tag.Name, newTag.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MainWindowInstance.SuggestedTagList.Add(newTag);
+                }*/
+            }
+
+        }
 
         #endregion
     }

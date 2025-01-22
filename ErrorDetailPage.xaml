@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:data="using:ElectronicCorrectionNotebook.DataStructure"
     mc:Ignorable="d"
     x:Name="rootPage"
     DataContext="{Binding RelativeSource={RelativeSource Self}}">
@@ -42,41 +43,64 @@
                 <Grid>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <FontIcon Glyph="&#xE70F;" />
-                        <TextBlock Text="Title 标题" FontSize="21" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Title 标题" FontSize="21" Margin="10,0,0,0" 
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                     <RatingControl IsClearEnabled="True" x:Name="RatingChoose"
                             IsReadOnly="False" Caption="Importance"
-                            HorizontalAlignment="Right" Margin="0,5,10,0"
-                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right" Margin="0,0,10,0"
                             Value="{Binding ErrorItem.Rating, Mode=TwoWay}">
                     </RatingControl>
                 </Grid>
-                <TextBox x:Name="TitleTextBox" TextChanged="TitleTextBox_TextChanged"
-                         Text="{Binding ErrorItem.Title, Mode=TwoWay}"
+                <TextBox x:Name="TitleTextBox"
+                         Text="{Binding ErrorItem.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          FontSize="15" Margin="0,0,0,10"/>
             </StackPanel>
 
             <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" Margin="25,0,0,0">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.1*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="10,0,0,0">
-                        <FontIcon Glyph="&#xE8EC;" Margin="0,5,0,0" Grid.Column="0" HorizontalAlignment="Left"/>
-                        <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0"  Grid.Column="1" 
-                                HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <FontIcon Glyph="&#xE8EC;"/>
+                        <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0"
+                                    VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
+
+                <controls:TokenizingTextBox x:Name="TagTextBox"
+                                            FontFamily="{StaticResource FontRegular}"
+                                            TokenDelimiter="/"
+                                            PlaceholderText="Press ENTER to tag"
+                                            
+                                            TokenItemAdding="TokenBox_TokenItemAdding"
+                                            
+                                            ItemsSource="{Binding ErrorItem.TagItems, Mode=TwoWay}"
+                                            SuggestedItemsSource="{Binding MainWindowInstance.SuggestedTagList}"
+                                            TextMemberPath="Name">
+                    
+                    <controls:TokenizingTextBox.SuggestedItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </controls:TokenizingTextBox.SuggestedItemTemplate>
+                    
+                    <controls:TokenizingTextBox.TokenItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </controls:TokenizingTextBox.TokenItemTemplate>
+                    
+                </controls:TokenizingTextBox>
             </StackPanel>
 
             <StackPanel x:Name="RightButtonZone" Orientation="Vertical" Grid.Column="2" Margin="25,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <AppBarButton Icon="Delete" Label="Delete" Click="DeleteClick" Foreground="Red"
-                                    BorderBrush="Red" BorderThickness="1" FontFamily="{StaticResource FontRegular}">
+                                  BorderBrush="Red" BorderThickness="1" CornerRadius="{StaticResource Corner8}"
+                                  FontFamily="{StaticResource FontRegular}">
                     </AppBarButton>
                     <AppBarButton Icon="Save" Label="Save" Click="OnSaveClick" Foreground="Green"
-                                    BorderBrush="Green" BorderThickness="1" FontFamily="{StaticResource FontRegular}">
+                                  BorderBrush="Green" BorderThickness="1" CornerRadius="{StaticResource Corner8}"
+                                  FontFamily="{StaticResource FontRegular}">
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control" Key="S"/>
                         </AppBarButton.KeyboardAccelerators>
@@ -130,10 +154,12 @@
                 </Button>
 
                 <DropDownButton x:Name="highlightButton" AutomationProperties.Name="High Light"
-                        BorderThickness="0" ToolTipService.ToolTip="Font color"
-                        Background="Transparent" Margin="10,0,0,0">
+                                ToolTipService.ToolTip="HightLight color"
+                                Background="{Binding SelectedHLColor}" BorderThickness="1"
+                                CornerRadius="{StaticResource Corner8}"
+                                Margin="10,0,0,0">
                     <Button.Content>
-                        <FontIcon Glyph="&#xE7E7;"/>
+                        <FontIcon Glyph="&#xE7E6;" />
                     </Button.Content>
                     <DropDownButton.Flyout>
                         <Flyout Placement="Bottom">
@@ -226,8 +252,10 @@
                 </DropDownButton>
 
                 <DropDownButton x:Name="fontColorButton" AutomationProperties.Name="Font color"
-                                BorderThickness="0" ToolTipService.ToolTip="Font color"
-                                Background="Transparent" Margin="10,0,0,0">
+                                ToolTipService.ToolTip="Font color"
+                                CornerRadius="{StaticResource Corner8}"
+                                BorderThickness="1" BorderBrush="{Binding SelectedFontColor}" 
+                                Margin="10,0,0,0">
                     <SymbolIcon Symbol="FontColor"/>
                     <DropDownButton.Flyout>
                         <Flyout Placement="Bottom">

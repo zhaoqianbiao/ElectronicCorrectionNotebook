@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 
 namespace ElectronicCorrectionNotebook.DataStructure
 {
     public class ErrorItem : INotifyPropertyChanged
     {
+        // Guid
         private Guid id = Guid.NewGuid(); // 私有字段，存储实际的值
         public Guid Id
         {
@@ -21,6 +23,7 @@ namespace ElectronicCorrectionNotebook.DataStructure
             }
         }
 
+        // Title
         private string title; // 私有字段
         public string Title   // 公共属性
         {
@@ -35,6 +38,7 @@ namespace ElectronicCorrectionNotebook.DataStructure
             }
         }
 
+        // Date
         private DateTimeOffset? date; // 私有字段
         public DateTimeOffset? Date   // 公共属性
         {
@@ -49,6 +53,7 @@ namespace ElectronicCorrectionNotebook.DataStructure
             }
         }
 
+        // Files Path
         private List<string> filePaths = new List<string>(); // 私有字段
         public List<string> FilePaths                       // 公共属性
         {
@@ -63,6 +68,7 @@ namespace ElectronicCorrectionNotebook.DataStructure
             }
         }
 
+        // Rating star
         private double rating; // 私有字段
         public double Rating   // 公共属性
         {
@@ -77,10 +83,22 @@ namespace ElectronicCorrectionNotebook.DataStructure
             }
         }
 
-        // 实现 INotifyPropertyChanged 接口
+        // Tags
+        private ObservableCollection<TagItem> tagItems = new ObservableCollection<TagItem>(); // 私有字段
+        public ObservableCollection<TagItem> TagItems
+        {
+            get => tagItems;
+            set
+            {
+                if (tagItems != value)
+                {
+                    tagItems = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+         
         public event PropertyChangedEventHandler PropertyChanged;
-
-        // 通知属性更改的方法
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

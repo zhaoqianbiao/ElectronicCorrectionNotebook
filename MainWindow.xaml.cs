@@ -17,13 +17,31 @@ using PInvoke;
 using ElectronicCorrectionNotebook.DataStructure;
 using Microsoft.UI.Xaml.Data;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace ElectronicCorrectionNotebook
 {
-
     public sealed partial class MainWindow : Window
     {
         public ObservableCollection<ErrorItem> ErrorItems { get; set; } = new ObservableCollection<ErrorItem>();
+
+        // Suggested Tags 只存在一次的
+        private ObservableCollection<TagItem> suggestedTagList { get; set; } = new ObservableCollection<TagItem>();
+        public ObservableCollection<TagItem> SuggestedTagList
+        {
+            get => suggestedTagList;
+            set
+            {
+                if (suggestedTagList != value)
+                {
+                    suggestedTagList = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private CancellationTokenSource cts;
 
         private const int MinWidth = 1250;  // 设置最小宽度
@@ -56,10 +74,31 @@ namespace ElectronicCorrectionNotebook
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
-
         }
 
-        // 加载数据-从json中读取数据
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // 临时解决方案
+        /*public void UpdateSuggestedTagList()
+        {
+            SuggestedTagList.Clear();
+            foreach (var item in ErrorItems)
+            {
+                foreach (var tag in item.TagItems)
+                {
+                    if (!SuggestedTagList.Contains(tag))
+                    {
+                        SuggestedTagList.Add(tag);
+                    }
+                }
+            }
+        }*/
+
+        // 加载数据-从json中读取数据+制作suggestedTagList
         public async Task LoadDataAsync(CancellationToken token)
         {
             try
@@ -68,7 +107,23 @@ namespace ElectronicCorrectionNotebook
                 foreach (var item in items)
                 {
                     ErrorItems.Add(item);
+                    foreach (var tagItem in item.TagItems)
+                    {
+                        // 会有重复
+                        /*if (!SuggestedTagList.Contains(tag))
+                        {
+                            SuggestedTagList.Add(tag);
+                        }*/
+
+                        if (!SuggestedTagList.Any(tag => string.Equals(tag.Name, tagItem.Name, StringComparison.Ordinal)))
+                        {
+                            SuggestedTagList.Add(tagItem);
+                        }
+                    }
+                    
                 }
+
+
             }
             catch (OperationCanceledException)
             {
