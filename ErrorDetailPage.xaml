@@ -122,7 +122,7 @@
             </Grid>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
                 VerticalScrollBarVisibility="Auto"
-                MaxHeight="100"
+                MaxHeight="70"
                 CornerRadius="{StaticResource Corner8}">
                 <controls:TokenizingTextBox x:Name="TagTextBox"
                     Margin="0,-2,0,0"
