@@ -89,6 +89,7 @@
                     SuggestionChosen="AutoSuggestBox_SuggestionChosen"
                     FontFamily="{StaticResource FontRegular}"
                     CornerRadius="{StaticResource Corner8}"/>
+
             </NavigationView.AutoSuggestBox>
 
             <NavigationView.MenuItems>

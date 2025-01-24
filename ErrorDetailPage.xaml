@@ -13,9 +13,9 @@
     x:Name="rootPage"
     DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-    <StackPanel Margin="30,23,30,0" x:Name="rootPanel">
+    <Grid Margin="30,23,30,0" x:Name="rootPanel">
 
-        <StackPanel.Resources>
+        <Grid.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource FontBold}"/>
             </Style>
@@ -29,11 +29,29 @@
                 <Setter Property="FontFamily" Value="{StaticResource FontRegular}"/>
                 <Setter Property="CornerRadius" Value="{StaticResource Corner8}"/>
             </Style>
+        </Grid.Resources>
 
-        </StackPanel.Resources>
-        
-        <!--上方三巨头-->
-        <Grid>
+        <!-- 定义行 -->
+        <Grid.RowDefinitions>
+            <!-- 标题和日期和大按钮 -->
+            <RowDefinition Height="Auto"/>
+
+            <!-- 标签 -->
+            <RowDefinition Height="Auto"/>
+
+            <!-- 描述和工具栏 -->
+            <RowDefinition Height="Auto"/>
+
+            <!-- 文件标题和按钮 -->
+            <RowDefinition Height="Auto"/>
+
+            <!-- ScrollViewer，占用剩余空间 -->
+            <RowDefinition Height="*"/>
+
+        </Grid.RowDefinitions>
+
+        <!-- 标题和日期和大按钮 -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
             <!--Grid布局比例设置-->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.5*"/>
@@ -42,7 +60,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel x:Name="leftZone" Orientation="Vertical" Grid.Column="0">
-                <Grid>
+                <Grid Margin="0,0,0,5">
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <FontIcon Glyph="&#xE70F;" />
                         <TextBlock Text="Title 标题" FontSize="21" Margin="10,0,0,0" 
@@ -56,7 +74,7 @@
                 </Grid>
                 <TextBox x:Name="TitleTextBox"
                          Text="{Binding ErrorItem.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         FontSize="15" Margin="0,5,0,0"/>
+                         FontSize="15"/>
             </StackPanel>
 
             <StackPanel x:Name="MiddleTagZone" Orientation="Vertical" Grid.Column="1" 
@@ -90,308 +108,327 @@
             </StackPanel>
         </Grid>
 
-        <!--Tag-->
-        <Grid>
-            <StackPanel Orientation="Horizontal" Margin="10,20,0,0">
-                <FontIcon Glyph="&#xE8EC;"/>
-                <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0" VerticalAlignment="Center"/>
-            </StackPanel>
-        </Grid>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                        VerticalScrollBarVisibility="Auto"
-                        MaxHeight="100"
-                        CornerRadius="{StaticResource Corner8}">
-            <controls:TokenizingTextBox x:Name="TagTextBox"
-                            Margin="0,-2,0,0"
-                            CornerRadius="{StaticResource Corner8}"
-                            FontFamily="{StaticResource FontRegular}"
-                            TokenDelimiter="/"
-                            PlaceholderText="Use ENTER or / to tag"
-                            TokenItemAdding="TokenBox_TokenItemAdding"
-                            ItemsSource="{Binding ErrorItem.TagItems, Mode=TwoWay}"
-                            SuggestedItemsSource="{Binding MainWindowInstance.SuggestedTagList}"
-                            TextMemberPath="Name">
+        <!-- 标签Tag -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,5">
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <FontIcon Glyph="&#xE8EC;"/>
+                    <TextBlock Text="Tag 标签" FontSize="21" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.Row="1"
+                VerticalScrollBarVisibility="Auto"
+                MaxHeight="100"
+                CornerRadius="{StaticResource Corner8}">
+                <controls:TokenizingTextBox x:Name="TagTextBox"
+                    Margin="0,-2,0,0"
+                    CornerRadius="{StaticResource Corner8}"
+                    FontFamily="{StaticResource FontRegular}"
+                    TokenDelimiter="/"
+                    PlaceholderText="Use ENTER or / to tag"
+                    TokenItemAdding="TokenBox_TokenItemAdding"
+                    ItemsSource="{Binding ErrorItem.TagItems, Mode=TwoWay}"
+                    SuggestedItemsSource="{Binding FilteredSuggestedTags}"
+                    TextChanged="TagTextBox_TextChanged"                     
+                    TextMemberPath="Name">
 
-                <controls:TokenizingTextBox.SuggestedItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" FontFamily="{StaticResource FontRegular}"/>
-                    </DataTemplate>
-                </controls:TokenizingTextBox.SuggestedItemTemplate>
+                    <controls:TokenizingTextBox.SuggestedItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontFamily="{StaticResource FontRegular}"/>
+                        </DataTemplate>
+                    </controls:TokenizingTextBox.SuggestedItemTemplate>
 
-                <controls:TokenizingTextBox.TokenItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" FontFamily="{StaticResource FontRegular}"/>
-                    </DataTemplate>
-                </controls:TokenizingTextBox.TokenItemTemplate>
+                    <controls:TokenizingTextBox.TokenItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontFamily="{StaticResource FontRegular}"/>
+                        </DataTemplate>
+                    </controls:TokenizingTextBox.TokenItemTemplate>
 
-            </controls:TokenizingTextBox>
-        </ScrollViewer>
-
-        <!--Description-->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal" Margin="10,20,0,0">
-                <FontIcon Glyph="&#xE736;"/>
-                <TextBlock Text="Description 详细描述" FontSize="21" Margin="10,0,0,0"
-                           VerticalAlignment="Center"/>
-            </StackPanel>
-            
-            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,10,10,0">
-                <Button AutomationProperties.Name="Bold" ToolTipService.ToolTip="Bold" Click="BoldButton_Click">
-                    <Button.Content>
-                        <FontIcon Glyph="&#xE8DD;"/>
-                    </Button.Content>
-                </Button>
-
-                <Button x:Name="italicButton" Click="ItalicButton_Click" AutomationProperties.Name="Italic" ToolTipService.ToolTip="Italic"
-                        Margin="10,0,0,0">
-                    <Button.Content>
-                        <FontIcon Glyph="&#xE8DB;"/>
-                    </Button.Content>
-                </Button>
-
-                <Button x:Name="underlineButton" Click="UnderlineButton_Click" AutomationProperties.Name="Underline" ToolTipService.ToolTip="Underline"
-                        Margin="10,0,0,0">
-                    <Button.Content>
-                        <FontIcon Glyph="&#xE8DC;"/>
-                    </Button.Content>
-                </Button>
-
-                <DropDownButton x:Name="highlightButton" AutomationProperties.Name="High Light"
-                                ToolTipService.ToolTip="HightLight color"
-                                Background="{Binding SelectedHLColor}" BorderThickness="1"
-                                CornerRadius="{StaticResource Corner8}"
-                                Margin="10,0,0,0">
-                    <Button.Content>
-                        <FontIcon Glyph="&#xE7E6;" />
-                    </Button.Content>
-                    <DropDownButton.Flyout>
-                        <Flyout Placement="Bottom">
-                            <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
-                                <VariableSizedWrapGrid.Resources>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Width" Value="30"/>
-                                        <Setter Property="Height" Value="30"/>
-                                    </Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="MinWidth" Value="0"/>
-                                        <Setter Property="MinHeight" Value="0"/>
-                                        <Setter Property="Margin" Value="5"/>
-                                        <Setter Property="CornerRadius" Value="20"/>
-                                        <Setter Property="BorderBrush" Value="Black"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Grid>
-                                                        <VisualStateManager.VisualStateGroups>
-                                                            <VisualStateGroup x:Name="CommonStates">
-                                                                <VisualState x:Name="Normal"/>
-                                                                <VisualState x:Name="PointerOver">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                                <VisualState x:Name="Pressed">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                                <VisualState x:Name="Disabled">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                            </VisualStateGroup>
-                                                        </VisualStateManager.VisualStateGroups>
-                                                        <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
-                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                        </Border>
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </VariableSizedWrapGrid.Resources>
-                                
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Transparent">
-                                    <Button.Content>
-                                        <Rectangle Fill="Transparent"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Red">
-                                    <Button.Content>
-                                        <Rectangle Fill="Red"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Orange">
-                                    <Button.Content>
-                                        <Rectangle Fill="Orange"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Yellow">
-                                    <Button.Content>
-                                        <Rectangle Fill="Yellow"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Pink">
-                                    <Button.Content>
-                                        <Rectangle Fill="Pink"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="HighlightButton_Click" AutomationProperties.Name="Green">
-                                    <Button.Content>
-                                        <Rectangle Fill="Green"/>
-                                    </Button.Content>
-                                </Button>
-                            </VariableSizedWrapGrid>
-                        </Flyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
-
-                <DropDownButton x:Name="fontColorButton" AutomationProperties.Name="Font color"
-                                ToolTipService.ToolTip="Font color"
-                                CornerRadius="{StaticResource Corner8}"
-                                BorderThickness="1" BorderBrush="{Binding SelectedFontColor}" 
-                                Margin="10,0,0,0">
-                    <SymbolIcon Symbol="FontColor"/>
-                    <DropDownButton.Flyout>
-                        <Flyout Placement="Bottom">
-                            <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
-                                <VariableSizedWrapGrid.Resources>
-                                    <Style TargetType="Rectangle">
-                                        <Setter Property="Width" Value="32"/>
-                                        <Setter Property="Height" Value="32"/>
-                                    </Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="MinWidth" Value="0"/>
-                                        <Setter Property="MinHeight" Value="0"/>
-                                        <Setter Property="Margin" Value="5"/>
-                                        <Setter Property="CornerRadius" Value="20"/>
-                                        <Setter Property="BorderBrush" Value="Black"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Grid>
-                                                        <VisualStateManager.VisualStateGroups>
-                                                            <VisualStateGroup x:Name="CommonStates">
-                                                                <VisualState x:Name="Normal"/>
-                                                                <VisualState x:Name="PointerOver">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                                <VisualState x:Name="Pressed">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                                <VisualState x:Name="Disabled">
-                                                                    <Storyboard>
-                                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
-                                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
-                                                                        </ObjectAnimationUsingKeyFrames>
-                                                                    </Storyboard>
-                                                                </VisualState>
-                                                            </VisualStateGroup>
-                                                        </VisualStateManager.VisualStateGroups>
-                                                        <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
-                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                        </Border>
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </VariableSizedWrapGrid.Resources>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="White">
-                                    <Button.Content>
-                                        <Rectangle Fill="White"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Black">
-                                    <Button.Content>
-                                        <Rectangle Fill="Black"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Red">
-                                    <Button.Content>
-                                        <Rectangle Fill="Red"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Orange">
-                                    <Button.Content>
-                                        <Rectangle Fill="Orange"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Yellow">
-                                    <Button.Content>
-                                        <Rectangle Fill="Yellow"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Violet">
-                                    <Button.Content>
-                                        <Rectangle Fill="Violet"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Green">
-                                    <Button.Content>
-                                        <Rectangle Fill="Green"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Indigo">
-                                    <Button.Content>
-                                        <Rectangle Fill="Indigo"/>
-                                    </Button.Content>
-                                </Button>
-                                <Button Click="ColorButton_Click" AutomationProperties.Name="Gray">
-                                    <Button.Content>
-                                        <Rectangle Fill="Gray"/>
-                                    </Button.Content>
-                                </Button>
-                            </VariableSizedWrapGrid>
-                        </Flyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
-            </StackPanel>
-            
+                </controls:TokenizingTextBox>
+            </ScrollViewer>
         </Grid>
 
-        <!--RichEditBox-->
-        <RichEditBox x:Name="DescriptionRichEditBox"
-                FontSize="15" Margin="0,10,0,0" AcceptsReturn="True" Height="240" TextWrapping="Wrap" CornerRadius="8"
-                     FontFamily="{StaticResource FontRegular}">
-            
-        </RichEditBox>
-        <controls:PropertySizer Binding="{x:Bind DescriptionRichEditBox.Height, Mode=TwoWay}" VerticalAlignment="Top"
-                                Orientation="Horizontal" Margin="0,0,0,10" CornerRadius="5" Height="12" Minimum="100"/>
+        <!-- 描述和工具栏 -->
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
 
+            <!--Description-->
+            <Grid Grid.Row="0" Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <!--Files-->
-        <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-            <FontIcon Glyph="&#xE9F9;" />
-            <TextBlock Text="Files 文件" FontSize="21" Margin="10,0,15,0" VerticalAlignment="Center"/>
-            <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
-            <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
-            <Button Content="Refresh 刷新文件栏" Click="RefreshButton_Click" Margin="0,0,10,0"/>
-        </StackPanel>
-        
-        <ScrollViewer Height="270" Margin="0, 10, 0, 10">
+                <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal" Margin="10,0,0,0">
+                    <FontIcon Glyph="&#xE736;"/>
+                    <TextBlock Text="Description 详细描述" FontSize="21" Margin="10,0,0,0"
+                   VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,10,0">
+                    <Button AutomationProperties.Name="Bold" ToolTipService.ToolTip="Bold" Click="BoldButton_Click">
+                        <Button.Content>
+                            <FontIcon Glyph="&#xE8DD;"/>
+                        </Button.Content>
+                    </Button>
+
+                    <Button x:Name="italicButton" Click="ItalicButton_Click" AutomationProperties.Name="Italic" ToolTipService.ToolTip="Italic"
+                Margin="10,0,0,0">
+                        <Button.Content>
+                            <FontIcon Glyph="&#xE8DB;"/>
+                        </Button.Content>
+                    </Button>
+
+                    <Button x:Name="underlineButton" Click="UnderlineButton_Click" AutomationProperties.Name="Underline" ToolTipService.ToolTip="Underline"
+                Margin="10,0,0,0">
+                        <Button.Content>
+                            <FontIcon Glyph="&#xE8DC;"/>
+                        </Button.Content>
+                    </Button>
+
+                    <DropDownButton x:Name="highlightButton" AutomationProperties.Name="High Light"
+                        ToolTipService.ToolTip="HightLight color"
+                        Background="{Binding SelectedHLColor}" BorderThickness="1"
+                        CornerRadius="{StaticResource Corner8}"
+                        Margin="10,0,0,0">
+                        <Button.Content>
+                            <FontIcon Glyph="&#xE7E6;" />
+                        </Button.Content>
+                        <DropDownButton.Flyout>
+                            <Flyout Placement="Bottom">
+                                <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
+                                    <VariableSizedWrapGrid.Resources>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Width" Value="30"/>
+                                            <Setter Property="Height" Value="30"/>
+                                        </Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="MinWidth" Value="0"/>
+                                            <Setter Property="MinHeight" Value="0"/>
+                                            <Setter Property="Margin" Value="5"/>
+                                            <Setter Property="CornerRadius" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Black"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid>
+                                                            <VisualStateManager.VisualStateGroups>
+                                                                <VisualStateGroup x:Name="CommonStates">
+                                                                    <VisualState x:Name="Normal"/>
+                                                                    <VisualState x:Name="PointerOver">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                    <VisualState x:Name="Pressed">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                    <VisualState x:Name="Disabled">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                </VisualStateGroup>
+                                                            </VisualStateManager.VisualStateGroups>
+                                                            <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </VariableSizedWrapGrid.Resources>
+
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Transparent">
+                                        <Button.Content>
+                                            <Rectangle Fill="Transparent"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Red">
+                                        <Button.Content>
+                                            <Rectangle Fill="Red"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Orange">
+                                        <Button.Content>
+                                            <Rectangle Fill="Orange"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Yellow">
+                                        <Button.Content>
+                                            <Rectangle Fill="Yellow"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Pink">
+                                        <Button.Content>
+                                            <Rectangle Fill="Pink"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="HighlightButton_Click" AutomationProperties.Name="Green">
+                                        <Button.Content>
+                                            <Rectangle Fill="Green"/>
+                                        </Button.Content>
+                                    </Button>
+                                </VariableSizedWrapGrid>
+                            </Flyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+
+                    <DropDownButton x:Name="fontColorButton" AutomationProperties.Name="Font color"
+                        ToolTipService.ToolTip="Font color"
+                        CornerRadius="{StaticResource Corner8}"
+                        BorderThickness="1" BorderBrush="{Binding SelectedFontColor}" 
+                        Margin="10,0,0,0">
+                        <SymbolIcon Symbol="FontColor"/>
+                        <DropDownButton.Flyout>
+                            <Flyout Placement="Bottom">
+                                <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="3">
+                                    <VariableSizedWrapGrid.Resources>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Width" Value="32"/>
+                                            <Setter Property="Height" Value="32"/>
+                                        </Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="MinWidth" Value="0"/>
+                                            <Setter Property="MinHeight" Value="0"/>
+                                            <Setter Property="Margin" Value="5"/>
+                                            <Setter Property="CornerRadius" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Black"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Grid>
+                                                            <VisualStateManager.VisualStateGroups>
+                                                                <VisualStateGroup x:Name="CommonStates">
+                                                                    <VisualState x:Name="Normal"/>
+                                                                    <VisualState x:Name="PointerOver">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                    <VisualState x:Name="Pressed">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                    <VisualState x:Name="Disabled">
+                                                                        <Storyboard>
+                                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
+                                                                                <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                                            </ObjectAnimationUsingKeyFrames>
+                                                                        </Storyboard>
+                                                                    </VisualState>
+                                                                </VisualStateGroup>
+                                                            </VisualStateManager.VisualStateGroups>
+                                                            <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </VariableSizedWrapGrid.Resources>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="White">
+                                        <Button.Content>
+                                            <Rectangle Fill="White"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Black">
+                                        <Button.Content>
+                                            <Rectangle Fill="Black"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Red">
+                                        <Button.Content>
+                                            <Rectangle Fill="Red"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Orange">
+                                        <Button.Content>
+                                            <Rectangle Fill="Orange"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Yellow">
+                                        <Button.Content>
+                                            <Rectangle Fill="Yellow"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Violet">
+                                        <Button.Content>
+                                            <Rectangle Fill="Violet"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Green">
+                                        <Button.Content>
+                                            <Rectangle Fill="Green"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Indigo">
+                                        <Button.Content>
+                                            <Rectangle Fill="Indigo"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Click="ColorButton_Click" AutomationProperties.Name="Gray">
+                                        <Button.Content>
+                                            <Rectangle Fill="Gray"/>
+                                        </Button.Content>
+                                    </Button>
+                                </VariableSizedWrapGrid>
+                            </Flyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </StackPanel>
+
+            </Grid>
+
+            <!--RichEditBox-->
+            <RichEditBox x:Name="DescriptionRichEditBox" Grid.Row="1"
+                    FontSize="15" Margin="0,0,0,0" AcceptsReturn="True" Height="240" TextWrapping="Wrap" CornerRadius="8"
+                    FontFamily="{StaticResource FontRegular}">
+
+            </RichEditBox>
+            <controls:PropertySizer Binding="{x:Bind DescriptionRichEditBox.Height, Mode=TwoWay}" 
+                                    VerticalAlignment="Bottom" Orientation="Horizontal" 
+                                    CornerRadius="5" Height="12" Minimum="100"
+                                    Grid.Row="1"/>
+        </Grid>
+
+        <!-- 文件标题和按钮 -->
+        <Grid Grid.Row="3" Margin="0,0,0,5">
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,5">
+                <FontIcon Glyph="&#xE9F9;" Margin="0,0,10,0"/>
+                <TextBlock Text="Files 文件" FontSize="21" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <Button Content="Select files 选择文件" Click="OnSelectFileClick" Margin="0,0,10,0"/>
+                <Button Content="Open from clipboard 剪贴板中打开" Click="OpenFromClipboardClick" Margin="0,0,10,0"/>
+                <Button Content="Refresh 刷新文件栏" Click="RefreshButton_Click" Margin="0,0,10,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ScrollViewer，占用剩余空间 -->
+        <ScrollViewer Margin="0,0,0,10" Grid.Row="4">
             <ItemsControl x:Name="FilePanel">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -401,10 +438,9 @@
             </ItemsControl>
         </ScrollViewer>
 
-        
-        
+        <!-- 适时激活对话框 -->
         <ContentDialog x:Name="Dialog" CloseButtonText="Close" PrimaryButtonText="以默认方式打开" 
                        PrimaryButtonClick="OpenFileInSystemClick" FontFamily="{StaticResource FontRegular}"/>
 
-    </StackPanel>
+    </Grid>
 </Page>

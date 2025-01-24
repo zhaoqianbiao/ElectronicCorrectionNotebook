@@ -47,15 +47,27 @@ namespace ElectronicCorrectionNotebook
         }
 
         private ErrorItem errorItem;
-        public ErrorItem ErrorItem 
-        { 
+        public ErrorItem ErrorItem
+        {
             get => errorItem;
-            set 
-            { 
+            set
+            {
                 errorItem = value;
                 OnPropertyChanged();
             }
         }
+
+        private ObservableCollection<TagItem> filteredSuggestedTags;
+        public ObservableCollection<TagItem> FilteredSuggestedTags
+        {
+            get => filteredSuggestedTags;
+            set
+            {
+                filteredSuggestedTags = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         private Brush _selectedFontColor = new SolidColorBrush(Colors.Black);
         public Brush SelectedFontColor
@@ -90,7 +102,7 @@ namespace ElectronicCorrectionNotebook
         private readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ElectronicCorrectionNotebook");
         private CancellationTokenSource cts;
 
-        private Microsoft.UI.Xaml.Controls.Image dialogImage; 
+        private Microsoft.UI.Xaml.Controls.Image dialogImage;
         private TextBlock dialogTextBlock;
         private MediaPlayerElement dialogMediaPlayer;
 
@@ -102,6 +114,7 @@ namespace ElectronicCorrectionNotebook
             this.MainWindowInstance = (MainWindow)App.MainWindow;
             this.DataContext = this;
 
+            FilteredSuggestedTags = new ObservableCollection<TagItem>(MainWindowInstance.SuggestedTagList);
         }
 
         private void TagItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -412,12 +425,12 @@ namespace ElectronicCorrectionNotebook
                 var contextMenu = new MenuFlyout();
 
                 // 菜单1 复制文件
-                var copyItem = new MenuFlyoutItem { Text = "Copy 复制", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
+                var copyItem = new MenuFlyoutItem { Text = "Copy 复制", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"] };
                 copyItem.Click += (sender, e) => CopyFile(filePath);
                 contextMenu.Items.Add(copyItem);
 
                 // 菜单2 删除
-                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"]};
+                var deleteItem = new MenuFlyoutItem { Text = "Delete 删除", FontFamily = (FontFamily)Application.Current.Resources["FontRegular"] };
                 deleteItem.Click += (sender, e) => DeleteImage(filePath);
                 contextMenu.Items.Add(deleteItem);
 
@@ -432,7 +445,7 @@ namespace ElectronicCorrectionNotebook
                     TextAlignment = TextAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     FontSize = 12,
-                    Margin = new Thickness(0,5,0,0),
+                    Margin = new Thickness(0, 5, 0, 0),
                     FontFamily = (FontFamily)Application.Current.Resources["FontRegular"],
                 };
                 var contentPanel = new StackPanel
@@ -765,11 +778,11 @@ namespace ElectronicCorrectionNotebook
         // 把剪切板的文件复制到Files文件夹（可操作任意文件）
         private async Task SaveFileToFixedPathAsync(StorageFile sourceFile, string destinationPath)
         {
-            
+
             var destinationFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(destinationPath));
             var destinationFile = await destinationFolder.CreateFileAsync(Path.GetFileName(destinationPath), CreationCollisionOption.ReplaceExisting);
             await sourceFile.CopyAndReplaceAsync(destinationFile);
-            
+
         }
 
         // 把剪切板的Bitmap复制到Files文件夹（仅限截图）
@@ -868,6 +881,7 @@ namespace ElectronicCorrectionNotebook
 
         #region TokenizingTextBox
 
+        // 添加Tag
         private async void TokenBox_TokenItemAdding(object sender, TokenItemAddingEventArgs e)
         {
             // 去除输入文本的前后空格
@@ -915,6 +929,36 @@ namespace ElectronicCorrectionNotebook
 
         }
 
+        // 更改建议列表
+        private void TagTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
+        {
+            string enteredText = sender.Text.Trim();
+
+            // 清空现有的过滤结果
+            FilteredSuggestedTags.Clear();
+            IEnumerable<TagItem> filtered;
+
+            if (string.IsNullOrEmpty(enteredText))
+            {
+                // 如果输入为空，显示完整的建议列表
+                filtered = MainWindowInstance.SuggestedTagList;
+            }
+            else
+            {
+                // 根据输入过滤建议列表
+                filtered = MainWindowInstance.SuggestedTagList
+                    .Where(tag => tag.Name.IndexOf(enteredText, StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+
+            // 添加过滤后的结果
+            foreach (var tag in filtered)
+            {
+                FilteredSuggestedTags.Add(tag);
+            }
+        }
+
         #endregion
+
+
     }
 }
