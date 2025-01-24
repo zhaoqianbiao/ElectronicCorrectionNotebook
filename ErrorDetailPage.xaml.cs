@@ -57,18 +57,6 @@ namespace ElectronicCorrectionNotebook
             }
         }
 
-        private ObservableCollection<TagItem> filteredSuggestedTags;
-        public ObservableCollection<TagItem> FilteredSuggestedTags
-        {
-            get => filteredSuggestedTags;
-            set
-            {
-                filteredSuggestedTags = value;
-                OnPropertyChanged();
-            }
-        }
-
-
         private Brush _selectedFontColor = new SolidColorBrush(Colors.Black);
         public Brush SelectedFontColor
         {
@@ -114,7 +102,6 @@ namespace ElectronicCorrectionNotebook
             this.MainWindowInstance = (MainWindow)App.MainWindow;
             this.DataContext = this;
 
-            FilteredSuggestedTags = new ObservableCollection<TagItem>(MainWindowInstance.SuggestedTagList);
         }
 
         private void TagItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -881,7 +868,6 @@ namespace ElectronicCorrectionNotebook
 
         #region TokenizingTextBox
 
-        // 添加Tag
         private async void TokenBox_TokenItemAdding(object sender, TokenItemAddingEventArgs e)
         {
             // 去除输入文本的前后空格
@@ -929,36 +915,6 @@ namespace ElectronicCorrectionNotebook
 
         }
 
-        // 更改建议列表
-        private void TagTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs e)
-        {
-            string enteredText = sender.Text.Trim();
-
-            // 清空现有的过滤结果
-            FilteredSuggestedTags.Clear();
-            IEnumerable<TagItem> filtered;
-
-            if (string.IsNullOrEmpty(enteredText))
-            {
-                // 如果输入为空，显示完整的建议列表
-                filtered = MainWindowInstance.SuggestedTagList;
-            }
-            else
-            {
-                // 根据输入过滤建议列表
-                filtered = MainWindowInstance.SuggestedTagList
-                    .Where(tag => tag.Name.IndexOf(enteredText, StringComparison.OrdinalIgnoreCase) >= 0);
-            }
-
-            // 添加过滤后的结果
-            foreach (var tag in filtered)
-            {
-                FilteredSuggestedTags.Add(tag);
-            }
-        }
-
         #endregion
-
-
     }
 }
