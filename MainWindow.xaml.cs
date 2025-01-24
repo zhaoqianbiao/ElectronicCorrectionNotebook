@@ -274,14 +274,7 @@ namespace ElectronicCorrectionNotebook
         // 跳转的时候 自动选中对应的item
         private void SelectNavigationViewItem(ErrorItem errorItem)
         {
-            foreach (var menuItem in nvSample.MenuItems)
-            {
-                if (menuItem is NavigationViewItem item && item.Tag == errorItem)
-                {
-                    nvSample.SelectedItem = item;
-                    break;
-                }
-            }
+            nvSample.SelectedItem = errorItem;
         }
 
         // 显示错误消息
