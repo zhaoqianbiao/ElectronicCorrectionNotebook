@@ -1,41 +1,45 @@
-# ElectronicCorrectionNotebook Windows端电子错题本
-### A windows Electronic Correction Notebook, used to record your mistakes in exams and homework 
-### Windows端电子错题本📘📘📘
+# Electronic Correction Notebook 📖 Windows端电子错题本
 
-### 关于我：高三再读，等待申请的时候没事干，写了这个小软件，希望可以辅助大家偷偷内卷
-### About me：Grade 12 in international high school in CHINA, waiting for offers of universities....
+## ⁉️ 你是否... Do you... 
+经常犯同一个错误？而且令你恼怒？造成不便？考试吃亏？快看看这个电子错题本吧！   
+Have you ever made the same mistakes? and made you angry? caused inconvenience? lost marks in exams? Come and see the Electronic Correction Notebook!
 
-<img src="gitImage/tang.gif" width="200px">
+## 📢 简介 Introduction 
+A Electronic Correction Notebook for Windows, used to record and review your mistakes in any practices(eg. exams, cooking, sports), and any other mistakes you made previously. I hope this can help you improve your efficiency in learning and working.   
+Windows端开发的电子错题本，用于记录和复习你在任何练习中的错误（例如考试、做饭、运动），帮助提高学习和工作的记忆效率
 
-### 技术栈：WinUI3 + C# + XAML
+## 🪶 作者信息 About me
+Grade 12 in international high school in China, waiting for offers of universities....   
+高三再读，等候大学录取
 
-### 未来计划 持续更新中...🚩   
+## 🤖 技术栈 Technology stack：
+WinUI3
 
-1. 🔥新增文件夹功能，实现文件夹管理  
-2. 🔥新增粘贴链接🔗功能   
-3. 🔥新增黑暗/明亮主题      
-4. 🔥新增自定义颜色主题   
+## 🚩 未来计划 持续更新中 Future features...  🔥 
+- [ ] 添加Tag筛选功能 Tag filter
+- [ ] 添加错题导出pdf功能 Export to pdf to share
+- [ ] 添加主题颜色选择功能 Pick theme colors
 
-~~2. 🔥新增图片/文件从剪贴板粘贴功能~~ （已实现）   
-~~4. 🔥新增删除page或文件的功能~~ （已实现）      
-~~7. 🔥新增Description标注功能（高亮，下划线，加粗，颜色等)~~    (已实现，但控件有bug，等待官方修复)   
-~~1. 🔥新增添加文件功能~~   （已实现）       
-~~6. 🔥新增标星/重要度标记功能~~ （已实现）       
-  
 
-## 🕶️Main Page 主页面
-![image](gitImage/mainPage.png)
-![image](gitImage/description.png)
+## 🕶️ Main Page 主页面 - 已启用Mica-BaseAlt效果 Win11食用效果更佳
+![image](gitImage/mainwindow.png)
 
-## 📊Files 文件预览
-![image](gitImage/imageDialog.png)
-![image](gitImage/videoDialog.png)
+## 📅 Date Picker 日期选择
+![image](gitImage/datepicker.png)]
 
-## ⚙️Settings 设置
-### 可实现笔记备份保存
-![image](gitImage/settingPage.png)
+## 🏷️ Tagging 添加已存在的标签或新建标签
+![image](gitImage/tag.png)]
 
-## 🥰About 关于
-![image](gitImage/about.png)
+## 📋 Rich Edit Box 富文本编辑器-rtf文件保存在本地
+![image](gitImage/richeditbox.png)]
+
+## 🗃️ Attach Files 附加文件
+![image](gitImage/datepicker.png)]
+
+## 📊 Files 文件预览
+![image](gitImage/preview.png)
+
+## ⚙️ Settings 设置
+![image](gitImage/settings.png)
 
 

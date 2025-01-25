@@ -92,6 +92,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="gitImage\" />
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
