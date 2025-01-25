@@ -20,26 +20,38 @@ WinUI3
 - [ ] 添加错题导出pdf功能 Export to pdf to share
 - [ ] 添加主题颜色选择功能 Pick theme colors
 
+### 🌟 支持的话就给个Star或Watch吧！Give me a star or watch if you like it! 🌟
+
 
 ## 🕶️ Main Page 主页面 - 已启用Mica-BaseAlt效果 Win11食用效果更佳
 ![image](gitImage/mainwindow.png)
 
 ## 📅 Date Picker 日期选择
-![image](gitImage/datepicker.png)]
+![image](gitImage/datepicker.png)
 
-## 🏷️ Tagging 添加已存在的标签或新建标签
-![image](gitImage/tag.png)]
+## 🏷️ Adding existed tag or create new 添加已存在的标签或新建标签
+后续会新增tag筛选功能   
+Add tag filter in the future.   
+![image](gitImage/tag.png)
 
 ## 📋 Rich Edit Box 富文本编辑器-rtf文件保存在本地
-![image](gitImage/richeditbox.png)]
+后续会添加rtf文件导入导出功能   
+Add export .rtf files in the future.   
+![image](gitImage/richeditbox.png)
 
 ## 🗃️ Attach Files 附加文件
-![image](gitImage/datepicker.png)]
+如果需要在图片上做标注，建议使用下方预览功能，以默认方式打开，然后标注保存，接着请点击刷新文件栏以显示最新的图片更改   
+If you want to annotate on the image, please use the preview function below, open it in the default way, annotate and save, then click the refresh button to show the latest image changes.   
+![image](gitImage/datepicker.png)
 
 ## 📊 Files 文件预览
+可预览txt文本，视频，音频，图片   
+Support previewing text, video, audio, image files.   
 ![image](gitImage/preview.png)
 
 ## ⚙️ Settings 设置
+以后会假如更多的设置功能  
+Add more setting setters in the future.   
 ![image](gitImage/settings.png)
 
 
