@@ -30,28 +30,28 @@ WinUI3
 ![image](gitImage/datepicker.png)
 
 ## 🏷️ Adding existed tag or create new 添加已存在的标签或新建标签
-后续会新增tag筛选功能   
-Add tag filter in the future.   
+**后续会新增tag筛选功能**   
+**Add tag filter in the future.**   
 ![image](gitImage/tag.png)
 
 ## 📋 Rich Edit Box 富文本编辑器-rtf文件保存在本地
-后续会添加rtf文件导入导出功能   
-Add export .rtf files in the future.   
+**后续会添加rtf文件导入导出功能**   
+**Add export .rtf files in the future.**   
 ![image](gitImage/richeditbox.png)
 
 ## 🗃️ Attach Files 附加文件
-如果需要在图片上做标注，建议使用下方预览功能，以默认方式打开，然后标注保存，接着请点击刷新文件栏以显示最新的图片更改   
-If you want to annotate on the image, please use the preview function below, open it in the default way, annotate and save, then click the refresh button to show the latest image changes.   
+**如果需要在图片上做标注，建议使用下方预览功能，以默认方式打开，然后标注保存，接着请点击刷新文件栏以显示最新的图片更改**   
+**If you want to annotate on the image, please use the preview function below, open it in the default way, annotate and save, then click the refresh button to show the latest image changes.**   
 ![image](gitImage/datepicker.png)
 
 ## 📊 Files 文件预览
-可预览txt文本，视频，音频，图片   
-Support previewing text, video, audio, image files.   
+**可预览txt文本，视频，音频，图片**   
+**Support previewing text, video, audio, image files.**   
 ![image](gitImage/preview.png)
 
 ## ⚙️ Settings 设置
-以后会假如更多的设置功能  
-Add more setting setters in the future.   
+**以后会假如更多的设置功能**  
+**Add more setting setters in the future.**   
 ![image](gitImage/settings.png)
 
 
