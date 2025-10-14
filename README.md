@@ -9,8 +9,7 @@ A Electronic Correction Notebook for Windows, used to record and review your mis
 Windows端开发的电子错题本，用于记录和复习你在任何练习中的错误（例如考试、做饭、运动），帮助提高学习和工作的记忆效率
 
 ## 🪶 作者信息 About me
-Grade 12 in international high school in China, waiting for offers of universities....   
-高三再读，等候大学录取
+University Of Illinois at Urbana Champaign Freshman
 
 ## 🤖 技术栈 Technology stack：
 WinUI3
